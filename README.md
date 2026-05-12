@@ -1,4 +1,4 @@
-# android_swe
+# AI-Career-Path-Android-Project
 
 A new Flutter project.
 
