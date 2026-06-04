@@ -15,30 +15,19 @@ final routerProvider = Provider<GoRouter>((ref) {
   final profile = ref.watch(profileProvider);
 
   return GoRouter(
-    initialLocation: '/splash',
+    initialLocation: '/login',
     redirect: (context, state) {
-      final isLoading = authState.isLoading;
-      if (isLoading) return '/splash';
+      // Check if we have authentication data
+      final isAuthenticated = authState.whenData((s) => s.session != null).value ?? false;
+      final isAuthRoute = state.matchedLocation == '/login' || state.matchedLocation == '/signup';
 
-      final isAuthenticated = authState.value?.session != null;
-      final isAuthRoute =
-          state.matchedLocation == '/login' ||
-          state.matchedLocation == '/signup';
-      final isSplash = state.matchedLocation == '/splash';
-
-      if (!isAuthenticated && !isAuthRoute && !isSplash) {
+      // If not authenticated and not on auth route, go to login
+      if (!isAuthenticated && !isAuthRoute) {
         return '/login';
       }
 
+      // If authenticated and on auth route, check onboarding
       if (isAuthenticated && isAuthRoute) {
-        final profileData = profile.value;
-        if (profileData != null && !profileData.isOnboardingComplete) {
-          return '/onboarding';
-        }
-        return '/dashboard';
-      }
-
-      if (isAuthenticated && isSplash) {
         final profileData = profile.value;
         if (profileData != null && !profileData.isOnboardingComplete) {
           return '/onboarding';
@@ -49,10 +38,6 @@ final routerProvider = Provider<GoRouter>((ref) {
       return null;
     },
     routes: [
-      GoRoute(
-        path: '/splash',
-        builder: (context, state) => const SplashScreen(),
-      ),
       GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
       GoRoute(
         path: '/signup',

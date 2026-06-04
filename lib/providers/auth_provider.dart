@@ -8,7 +8,11 @@ final authServiceProvider = Provider<AuthService>((ref) => AuthService());
 
 final authStateProvider = StreamProvider<AuthState>((ref) {
   final authService = ref.watch(authServiceProvider);
-  return authService.authStateChanges;
+  return authService.authStateChanges
+      .timeout(const Duration(seconds: 5))
+      .handleError((error, stackTrace) {
+    appLogger.e('Auth state error: $error');
+  });
 });
 
 final currentUserProvider = Provider<User?>((ref) {
