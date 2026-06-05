@@ -4,7 +4,7 @@ import 'supabase_service.dart';
 import '../../core/utils/logger.dart';
 
 class CareerService {
-  final _client = SupabaseService.client;
+  get _client => SupabaseService.client;
 
   Future<List<CareerPathModel>> getUserCareerPaths(String userId) async {
     try {

@@ -40,15 +40,37 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
 
     try {
       final authService = AuthService();
-      await authService.signUp(
+      final response = await authService.signUp(
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
         fullName: _nameController.text.trim(),
       );
+      if (!mounted) return;
+
+      if (response.session == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Account created. Please verify your email, then sign in.'),
+            backgroundColor: AppColors.success,
+          ),
+        );
+        context.go('/login');
+      } else {
+        context.go('/onboarding');
+      }
     } on AuthException catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(e.message), backgroundColor: AppColors.error),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Sign up failed: $e'),
+            backgroundColor: AppColors.error,
+          ),
         );
       }
     } finally {

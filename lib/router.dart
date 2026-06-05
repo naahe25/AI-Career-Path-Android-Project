@@ -24,6 +24,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       final isAuthRoute =
           state.matchedLocation == '/login' ||
           state.matchedLocation == '/signup';
+      final isOnboardingRoute = state.matchedLocation == '/onboarding';
 
       // While auth is being established (or revalidated), don't force redirects.
       // This prevents redirect loops / blank navigation during emulator startup.
@@ -43,19 +44,21 @@ final routerProvider = Provider<GoRouter>((ref) {
         return '/login';
       }
 
-      // If authenticated and on auth route, check onboarding.
-      if (isAuthenticated && isAuthRoute) {
+      if (isAuthenticated) {
         final profileData = profile.valueOrNull;
 
         // Profile may still be loading; avoid premature routing.
-        if (profile.isLoading || profile.isRefreshing || profileData == null) {
+        if (profile.isLoading || profile.isRefreshing) {
           return null;
         }
 
-        if (!profileData.isOnboardingComplete) {
-          return '/onboarding';
+        if (profileData == null || !profileData.isOnboardingComplete) {
+          return isOnboardingRoute ? null : '/onboarding';
         }
-        return '/dashboard';
+
+        if (isAuthRoute || isOnboardingRoute) {
+          return '/dashboard';
+        }
       }
 
       return null;

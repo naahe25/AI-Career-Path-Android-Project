@@ -4,7 +4,7 @@ import 'supabase_service.dart';
 import '../../core/utils/logger.dart';
 
 class AuthService {
-  final _client = SupabaseService.client;
+  SupabaseClient get _client => SupabaseService.client;
 
   Future<AuthResponse> signUp({
     required String email,
@@ -17,6 +17,10 @@ class AuthService {
         password: password,
         data: {'full_name': fullName},
       );
+      final user = response.user;
+      if (user != null && response.session != null) {
+        await updateProfile(user.id, {'full_name': fullName});
+      }
       appLogger.i('SignUp success: ${response.user?.id}');
       return response;
     } on AuthException catch (e) {
@@ -40,6 +44,13 @@ class AuthService {
       appLogger.e('SignIn error: ${e.message}');
       rethrow;
     }
+  }
+
+  Future<bool> signInWithOAuth(OAuthProvider provider) async {
+    return _client.auth.signInWithOAuth(
+      provider,
+      redirectTo: 'ai-career-path://login-callback/',
+    );
   }
 
   Future<void> signOut() async {
@@ -66,8 +77,8 @@ class AuthService {
           .from('profiles')
           .select()
           .eq('id', userId)
-          .single();
-      return ProfileModel.fromJson(data);
+          .maybeSingle();
+      return data != null ? ProfileModel.fromJson(data) : null;
     } catch (e) {
       appLogger.e('Get profile error: $e');
       return null;
@@ -81,8 +92,10 @@ class AuthService {
     try {
       final data = await _client
           .from('profiles')
-          .update(updates)
-          .eq('id', userId)
+          .upsert({
+            'id': userId,
+            ...updates,
+          })
           .select()
           .single();
       return ProfileModel.fromJson(data);
