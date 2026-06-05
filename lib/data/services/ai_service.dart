@@ -37,9 +37,10 @@ class GeneratedPath {
 
 class AiService {
   Future<List<GeneratedPath>> generateCareerPaths(ProfileModel profile) async {
+    // Make the app usable even when Edge/AI service is temporarily unavailable.
+    // The UI will still work using fallback demo paths.
     try {
       final session = SupabaseService.auth.currentSession;
-      if (session == null) throw Exception('Not authenticated');
 
       final response = await SupabaseService.client.functions.invoke(
         'generate-career-path',
@@ -72,10 +73,74 @@ class AiService {
       return paths;
     } on FunctionException catch (e) {
       appLogger.e('Edge function error: ${e.details}');
-      rethrow;
+      return _fallbackCareerPaths(profile);
+    } on Exception catch (e) {
+      appLogger.e('AI service error: $e');
+      // If user is not authenticated, also return fallback so the app keeps working.
+      return _fallbackCareerPaths(profile);
     } catch (e) {
       appLogger.e('AI service error: $e');
-      rethrow;
+      return _fallbackCareerPaths(profile);
     }
+  }
+
+  List<GeneratedPath> _fallbackCareerPaths(ProfileModel profile) {
+    final targetField = (profile.desiredField ?? '').trim();
+    final baseTitle = targetField.isNotEmpty
+        ? targetField
+        : 'Software Engineering';
+
+    return [
+      GeneratedPath(
+        title: '$baseTitle - Career Path (Starter)',
+        description:
+            'Demo fallback path generated locally because the AI service is unavailable.',
+        targetRole: 'Professional',
+        estimatedDurationMonths: 12,
+        difficultyLevel: 'beginner',
+        milestones: [
+          {
+            'title': 'Foundations',
+            'description': 'Core concepts & fundamentals',
+            'completed': false,
+          },
+          {
+            'title': 'Projects',
+            'description': 'Build 2-3 portfolio projects',
+            'completed': false,
+          },
+          {
+            'title': 'Interview Prep',
+            'description': 'Practice behavioral + technical rounds',
+            'completed': false,
+          },
+        ],
+      ),
+      GeneratedPath(
+        title: '$baseTitle - Career Path (Intermediate)',
+        description:
+            'A second demo fallback option to keep the app fully usable without backend.',
+        targetRole: 'Senior',
+        estimatedDurationMonths: 18,
+        difficultyLevel: 'intermediate',
+        milestones: [
+          {
+            'title': 'Specialization',
+            'description': 'Pick one specialization track',
+            'completed': false,
+          },
+          {
+            'title': 'Advanced Projects',
+            'description': 'Ship one production-like project',
+            'completed': false,
+          },
+          {
+            'title': 'Leadership & Impact',
+            'description': 'Show impact, metrics, and collaboration',
+            'completed': false,
+          },
+        ],
+      ),
+    ];
   }
 }
