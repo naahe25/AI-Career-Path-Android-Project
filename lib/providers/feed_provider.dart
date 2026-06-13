@@ -48,13 +48,14 @@ class FeedNotifier extends StateNotifier<AsyncValue<List<PostModel>>> {
     }
   }
 
-  Future<void> createPost(String content) async {
+  Future<void> createPost(String content, {String? imageUrl}) async {
     if (_userId == null) return;
     final profile = _ref.read(profileProvider).value;
     final post = await _service.createPost(
       userId: _userId,
       profile: profile,
       content: content,
+      imageUrl: imageUrl,
     );
     final current = state.value ?? [];
     state = AsyncValue.data([post, ...current]);
@@ -98,17 +99,18 @@ class SuggestedPeopleNotifier
     }
   }
 
-  Future<void> connect(String otherId) async {
+  Future<void> connect(ConnectionPerson person) async {
     if (_userId == null) return;
     final people = state.value;
     if (people == null) return;
+    final connectedStatus = person.source == 'directory' ? 'connected' : 'pending';
     state = AsyncValue.data(
       people
-          .map((p) => p.id == otherId ? p.copyWith(status: 'pending') : p)
+          .map((p) => p.id == person.id ? p.copyWith(status: connectedStatus) : p)
           .toList(),
     );
     try {
-      await _service.connect(_userId, otherId);
+      await _service.connect(_userId, person);
     } catch (_) {
       state = AsyncValue.data(people);
     }

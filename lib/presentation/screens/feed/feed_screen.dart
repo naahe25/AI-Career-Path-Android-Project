@@ -1,7 +1,9 @@
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_dimensions.dart';
 import '../../../data/models/post_model.dart';
@@ -225,7 +227,10 @@ class _ComposerSheet extends ConsumerStatefulWidget {
 
 class _ComposerSheetState extends ConsumerState<_ComposerSheet> {
   final _controller = TextEditingController();
+  final _picker = ImagePicker();
   bool _posting = false;
+  Uint8List? _imageBytes;
+  String _imageExt = 'jpg';
 
   @override
   void dispose() {
@@ -233,14 +238,52 @@ class _ComposerSheetState extends ConsumerState<_ComposerSheet> {
     super.dispose();
   }
 
+  Future<void> _pickImage() async {
+    try {
+      final file = await _picker.pickImage(
+        source: ImageSource.gallery,
+        maxWidth: 1600,
+        imageQuality: 85,
+      );
+      if (file == null) return;
+      final bytes = await file.readAsBytes();
+      final name = file.name.toLowerCase();
+      final ext = name.contains('.') ? name.split('.').last : 'jpg';
+      setState(() {
+        _imageBytes = bytes;
+        _imageExt = (ext == 'jpeg') ? 'jpg' : ext;
+      });
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Could not open the image picker.'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
+    }
+  }
+
   Future<void> _post() async {
     final text = _controller.text.trim();
-    if (text.isEmpty) return;
+    if (text.isEmpty && _imageBytes == null) return;
     setState(() => _posting = true);
     final messenger = ScaffoldMessenger.of(context);
     final navigator = Navigator.of(context);
     try {
-      await ref.read(feedProvider.notifier).createPost(text);
+      String? imageUrl;
+      if (_imageBytes != null) {
+        final userId = ref.read(currentUserProvider)?.id;
+        if (userId != null) {
+          imageUrl = await ref.read(feedServiceProvider).uploadPostImage(
+                userId,
+                _imageBytes!,
+                extension: _imageExt,
+              );
+        }
+      }
+      await ref.read(feedProvider.notifier).createPost(text, imageUrl: imageUrl);
       navigator.pop();
       messenger.showSnackBar(
         const SnackBar(
@@ -312,6 +355,72 @@ class _ComposerSheetState extends ConsumerState<_ComposerSheet> {
               decoration: const InputDecoration(
                 hintText: 'What do you want to talk about?',
               ),
+            ),
+            if (_imageBytes != null) ...[
+              const SizedBox(height: 14),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(AppDimensions.radiusL),
+                child: Stack(
+                  children: [
+                    Image.memory(
+                      _imageBytes!,
+                      width: double.infinity,
+                      height: 200,
+                      fit: BoxFit.cover,
+                    ),
+                    Positioned(
+                      top: 8,
+                      right: 8,
+                      child: GestureDetector(
+                        onTap: () => setState(() => _imageBytes = null),
+                        child: Container(
+                          width: 32,
+                          height: 32,
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            color: Colors.black.withValues(alpha: 0.55),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(Icons.close,
+                              color: Colors.white, size: 18),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                GestureDetector(
+                  onTap: _pickImage,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 14, vertical: 10),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withValues(alpha: 0.08),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.image_outlined,
+                            color: AppColors.primary, size: 20),
+                        const SizedBox(width: 8),
+                        Text(
+                          _imageBytes == null ? 'Add photo' : 'Change photo',
+                          style: const TextStyle(
+                            color: AppColors.primary,
+                            fontWeight: FontWeight.w700,
+                            fontSize: 13,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
             ),
             const SizedBox(height: 16),
             GradientButton(

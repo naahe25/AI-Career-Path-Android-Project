@@ -14,6 +14,7 @@ class JobModel {
   final String description;
   final List<String> requirements;
   final List<String> tags;
+  final String? postedBy;
   final DateTime postedAt;
 
   JobModel({
@@ -32,6 +33,7 @@ class JobModel {
     this.description = '',
     this.requirements = const [],
     this.tags = const [],
+    this.postedBy,
     required this.postedAt,
   });
 
@@ -53,6 +55,7 @@ class JobModel {
       requirements:
           (json['requirements'] as List<dynamic>?)?.map((e) => e.toString()).toList() ?? const [],
       tags: (json['tags'] as List<dynamic>?)?.map((e) => e.toString()).toList() ?? const [],
+      postedBy: json['posted_by'] as String?,
       postedAt: DateTime.parse(json['posted_at'] as String),
     );
   }

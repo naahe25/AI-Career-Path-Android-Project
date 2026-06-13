@@ -48,6 +48,48 @@ class JobService {
     }
   }
 
+  /// Creates a hiring listing posted by the current user (LinkedIn-style).
+  Future<JobModel> createJob({
+    required String userId,
+    required String title,
+    required String company,
+    required String location,
+    bool isRemote = false,
+    String employmentType = 'full_time',
+    String experienceLevel = 'mid',
+    String? category,
+    int? salaryMin,
+    int? salaryMax,
+    required String description,
+    List<String> requirements = const [],
+    List<String> tags = const [],
+  }) async {
+    try {
+      final row = {
+        'title': title,
+        'company': company,
+        'location': location,
+        'is_remote': isRemote,
+        'employment_type': employmentType,
+        'experience_level': experienceLevel,
+        'category': category,
+        'salary_min': salaryMin,
+        'salary_max': salaryMax,
+        'description': description,
+        'requirements': requirements,
+        'tags': tags,
+        'posted_by': userId,
+        'posted_at': DateTime.now().toIso8601String(),
+      };
+      final data = await _client.from('jobs').insert(row).select().single();
+      return JobModel.fromJson(data);
+    } catch (e) {
+      appLogger.e('Create job error: $e');
+      throw ServerException(
+          message: 'Failed to post job', originalException: e);
+    }
+  }
+
   // --- Saved jobs ---------------------------------------------------------
   Future<Set<String>> getSavedJobIds(String userId) async {
     try {

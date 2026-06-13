@@ -148,6 +148,39 @@ class FeedService {
   // --- Network -----------------------------------------------------------
   Future<List<ConnectionPerson>> getSuggestedPeople(String userId) async {
     try {
+      final people = <ConnectionPerson>[];
+
+      // 1) Seeded "people" directory (LinkedIn-style suggestions everyone sees).
+      try {
+        final directory =
+            await _client.from('people').select('id, name, title, company, avatar_url');
+        final userConnections = await _client
+            .from('user_connections')
+            .select('person_id, status')
+            .eq('user_id', userId);
+        final statusByPerson = <String, String>{};
+        for (final c in (userConnections as List)) {
+          statusByPerson[c['person_id'] as String] =
+              c['status'] == 'connected' ? 'connected' : 'pending';
+        }
+        for (final p in (directory as List)) {
+          final name = (p['name'] as String?)?.trim();
+          people.add(ConnectionPerson(
+            id: p['id'] as String,
+            name: (name == null || name.isEmpty) ? 'Member' : name,
+            title: p['title'] as String?,
+            company: p['company'] as String?,
+            avatarUrl: p['avatar_url'] as String?,
+            status: statusByPerson[p['id']] ?? 'none',
+            source: 'directory',
+          ));
+        }
+      } catch (e) {
+        // The people directory is optional; ignore if the table isn't present.
+        appLogger.e('Get people directory error: $e');
+      }
+
+      // 2) Other real members (actual app users).
       final profiles = await _client
           .from('profiles')
           .select('id, full_name, avatar_url, user_current_role, desired_field')
@@ -168,17 +201,20 @@ class FeedService {
             c['status'] == 'accepted' ? 'connected' : 'pending';
       }
 
-      return (profiles as List).map((p) {
+      for (final p in (profiles as List)) {
         final name = (p['full_name'] as String?)?.trim();
-        return ConnectionPerson(
+        people.add(ConnectionPerson(
           id: p['id'] as String,
           name: (name == null || name.isEmpty) ? 'Member' : name,
           title: (p['user_current_role'] as String?) ??
               (p['desired_field'] as String?),
           avatarUrl: p['avatar_url'] as String?,
           status: statusByPerson[p['id']] ?? 'none',
-        );
-      }).toList();
+          source: 'profile',
+        ));
+      }
+
+      return people;
     } catch (e) {
       appLogger.e('Get suggested people error: $e');
       throw ServerException(
@@ -186,13 +222,21 @@ class FeedService {
     }
   }
 
-  Future<void> connect(String userId, String otherId) async {
+  Future<void> connect(String userId, ConnectionPerson person) async {
     try {
-      await _client.from('connections').upsert({
-        'requester_id': userId,
-        'addressee_id': otherId,
-        'status': 'pending',
-      }, onConflict: 'requester_id,addressee_id');
+      if (person.source == 'directory') {
+        await _client.from('user_connections').upsert({
+          'user_id': userId,
+          'person_id': person.id,
+          'status': 'connected',
+        }, onConflict: 'user_id,person_id');
+      } else {
+        await _client.from('connections').upsert({
+          'requester_id': userId,
+          'addressee_id': person.id,
+          'status': 'pending',
+        }, onConflict: 'requester_id,addressee_id');
+      }
     } catch (e) {
       appLogger.e('Connect error: $e');
       rethrow;

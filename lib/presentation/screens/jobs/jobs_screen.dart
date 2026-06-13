@@ -63,9 +63,18 @@ class _JobsScreenState extends ConsumerState<JobsScreen> {
                       ),
                     ],
                   ),
-                  _RoundIconButton(
-                    icon: Icons.bookmark_border,
-                    onTap: () => context.push('/saved-jobs'),
+                  Row(
+                    children: [
+                      _RoundIconButton(
+                        icon: Icons.add,
+                        onTap: () => context.push('/post-job'),
+                      ),
+                      const SizedBox(width: 10),
+                      _RoundIconButton(
+                        icon: Icons.bookmark_border,
+                        onTap: () => context.push('/saved-jobs'),
+                      ),
+                    ],
                   ),
                 ],
               ).animate().fadeIn(),

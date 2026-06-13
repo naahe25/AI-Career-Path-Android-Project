@@ -50,7 +50,7 @@ class NetworkScreen extends ConsumerWidget {
                         person: entry.value,
                         onConnect: () => ref
                             .read(suggestedPeopleProvider.notifier)
-                            .connect(entry.value.id),
+                            .connect(entry.value),
                       )
                           .animate(delay: (entry.key * 50).ms)
                           .fadeIn(duration: 300.ms)
@@ -96,7 +96,9 @@ class _PersonCard extends StatelessWidget {
                 ),
                 if (person.title != null)
                   Text(
-                    person.title!,
+                    person.company != null && person.company!.isNotEmpty
+                        ? '${person.title} · ${person.company}'
+                        : person.title!,
                     style: const TextStyle(
                       fontSize: 12.5,
                       color: AppColors.textMuted,

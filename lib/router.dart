@@ -17,6 +17,7 @@ import 'presentation/screens/settings/settings_screen.dart';
 import 'presentation/screens/jobs/jobs_screen.dart';
 import 'presentation/screens/jobs/job_detail_screen.dart';
 import 'presentation/screens/jobs/saved_jobs_screen.dart';
+import 'presentation/screens/jobs/post_job_screen.dart';
 import 'presentation/screens/feed/feed_screen.dart';
 import 'presentation/screens/network/network_screen.dart';
 import 'presentation/widgets/common/main_shell.dart';
@@ -134,6 +135,11 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/saved-jobs',
         parentNavigatorKey: _rootKey,
         builder: (context, state) => const SavedJobsScreen(),
+      ),
+      GoRoute(
+        path: '/post-job',
+        parentNavigatorKey: _rootKey,
+        builder: (context, state) => const PostJobScreen(),
       ),
       GoRoute(
         path: '/career-path/:id',

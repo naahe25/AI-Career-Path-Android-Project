@@ -401,6 +401,21 @@ class _GeneratedPathsSheetState extends ConsumerState<_GeneratedPathsSheet> {
     final userId = ref.read(currentUserProvider)?.id;
     if (userId == null) return;
 
+    // Guard: a path can only be added once.
+    final existing = ref.read(careerPathsProvider).value ?? [];
+    final alreadyAdded = existing.any(
+      (p) => p.title.trim().toLowerCase() == path.title.trim().toLowerCase(),
+    );
+    if (alreadyAdded) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('You\'ve already added this path.'),
+          backgroundColor: AppColors.info,
+        ),
+      );
+      return;
+    }
+
     setState(() => _isSaving = true);
 
     try {
@@ -517,10 +532,19 @@ class _GeneratedPathsSheetState extends ConsumerState<_GeneratedPathsSheet> {
                       itemCount: paths.length,
                       itemBuilder: (context, index) {
                         final path = paths[index];
+                        final addedTitles = (ref
+                                    .watch(careerPathsProvider)
+                                    .value ??
+                                [])
+                            .map((p) => p.title.trim().toLowerCase())
+                            .toSet();
+                        final alreadyAdded = addedTitles
+                            .contains(path.title.trim().toLowerCase());
                         return _GeneratedPathCard(
                           path: path,
                           onSave: () => _savePath(path),
                           isSaving: _isSaving,
+                          alreadyAdded: alreadyAdded,
                           index: index,
                         );
                       },
@@ -551,12 +575,14 @@ class _GeneratedPathCard extends StatelessWidget {
   final GeneratedPath path;
   final VoidCallback onSave;
   final bool isSaving;
+  final bool alreadyAdded;
   final int index;
 
   const _GeneratedPathCard({
     required this.path,
     required this.onSave,
     required this.isSaving,
+    required this.alreadyAdded,
     required this.index,
   });
 

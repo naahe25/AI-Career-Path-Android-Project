@@ -68,6 +68,36 @@ class PostCard extends StatelessWidget {
               fontWeight: FontWeight.w500,
             ),
           ),
+          if (post.imageUrl != null && post.imageUrl!.isNotEmpty) ...[
+            const SizedBox(height: 12),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(14),
+              child: Image.network(
+                post.imageUrl!,
+                width: double.infinity,
+                fit: BoxFit.cover,
+                loadingBuilder: (context, child, progress) {
+                  if (progress == null) return child;
+                  return Container(
+                    height: 200,
+                    alignment: Alignment.center,
+                    color: AppColors.backgroundSurface,
+                    child: const CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: AppColors.primary,
+                    ),
+                  );
+                },
+                errorBuilder: (context, _, __) => Container(
+                  height: 160,
+                  alignment: Alignment.center,
+                  color: AppColors.backgroundSurface,
+                  child: const Icon(Icons.broken_image_outlined,
+                      color: AppColors.textMuted, size: 32),
+                ),
+              ),
+            ),
+          ],
           const SizedBox(height: 14),
           if (post.likesCount > 0 || post.commentsCount > 0) ...[
             Row(

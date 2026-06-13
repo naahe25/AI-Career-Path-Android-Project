@@ -101,22 +101,28 @@ class ConnectionPerson {
   final String id;
   final String name;
   final String? title;
+  final String? company;
   final String? avatarUrl;
   final String status; // none | pending | connected
+  final String source; // profile (real user) | directory (seeded people)
 
   ConnectionPerson({
     required this.id,
     required this.name,
     this.title,
+    this.company,
     this.avatarUrl,
     this.status = 'none',
+    this.source = 'profile',
   });
 
   ConnectionPerson copyWith({String? status}) => ConnectionPerson(
         id: id,
         name: name,
         title: title,
+        company: company,
         avatarUrl: avatarUrl,
         status: status ?? this.status,
+        source: source,
       );
 }
