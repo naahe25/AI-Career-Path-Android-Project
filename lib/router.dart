@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'providers/auth_provider.dart';
@@ -13,21 +14,32 @@ import 'presentation/screens/analytics/analytics_screen.dart';
 import 'presentation/screens/achievements/achievements_screen.dart';
 import 'presentation/screens/skills/skills_screen.dart';
 import 'presentation/screens/settings/settings_screen.dart';
+import 'presentation/screens/jobs/jobs_screen.dart';
+import 'presentation/screens/jobs/job_detail_screen.dart';
+import 'presentation/screens/jobs/saved_jobs_screen.dart';
+import 'presentation/screens/feed/feed_screen.dart';
+import 'presentation/screens/network/network_screen.dart';
+import 'presentation/widgets/common/main_shell.dart';
+
+final _rootKey = GlobalKey<NavigatorState>();
+final _homeKey = GlobalKey<NavigatorState>();
+final _jobsKey = GlobalKey<NavigatorState>();
+final _careerKey = GlobalKey<NavigatorState>();
+final _networkKey = GlobalKey<NavigatorState>();
+final _profileKey = GlobalKey<NavigatorState>();
 
 final routerProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authStateProvider);
   final profile = ref.watch(profileProvider);
 
   return GoRouter(
+    navigatorKey: _rootKey,
     initialLocation: '/login',
     redirect: (context, state) {
-      final isAuthRoute =
-          state.matchedLocation == '/login' ||
-          state.matchedLocation == '/signup';
-      final isOnboardingRoute = state.matchedLocation == '/onboarding';
+      final loc = state.matchedLocation;
+      final isAuthRoute = loc == '/login' || loc == '/signup';
 
       // While auth is being established (or revalidated), don't force redirects.
-      // This prevents redirect loops / blank navigation during emulator startup.
       if (authState.isLoading || authState.isRefreshing) {
         return null;
       }
@@ -39,80 +51,125 @@ final routerProvider = Provider<GoRouter>((ref) {
 
       final isAuthenticated = authState.valueOrNull?.session != null;
 
-      // If not authenticated and not on auth route, go to login.
       if (!isAuthenticated && !isAuthRoute) {
         return '/login';
       }
 
-      if (isAuthenticated) {
+      if (isAuthenticated && (isAuthRoute || loc == '/')) {
         final profileData = profile.valueOrNull;
-
-        // Profile may still be loading; avoid premature routing.
-        if (profile.isLoading || profile.isRefreshing) {
+        if (profile.isLoading || profile.isRefreshing || profileData == null) {
           return null;
         }
-
-        if (profileData == null || !profileData.isOnboardingComplete) {
-          return isOnboardingRoute ? null : '/onboarding';
+        if (!profileData.isOnboardingComplete) {
+          return '/onboarding';
         }
-
-        if (isAuthRoute || isOnboardingRoute) {
-          return '/dashboard';
-        }
+        return '/home';
       }
 
       return null;
     },
     routes: [
       GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
-      GoRoute(
-        path: '/signup',
-        builder: (context, state) => const SignupScreen(),
-      ),
+      GoRoute(path: '/signup', builder: (context, state) => const SignupScreen()),
       GoRoute(
         path: '/onboarding',
         builder: (context, state) => const OnboardingScreen(),
       ),
+
+      // Main app shell with the 5 primary tabs.
+      StatefulShellRoute.indexedStack(
+        builder: (context, state, navigationShell) =>
+            MainShell(navigationShell: navigationShell),
+        branches: [
+          StatefulShellBranch(
+            navigatorKey: _homeKey,
+            routes: [
+              GoRoute(path: '/home', builder: (context, state) => const FeedScreen()),
+            ],
+          ),
+          StatefulShellBranch(
+            navigatorKey: _jobsKey,
+            routes: [
+              GoRoute(path: '/jobs', builder: (context, state) => const JobsScreen()),
+            ],
+          ),
+          StatefulShellBranch(
+            navigatorKey: _careerKey,
+            routes: [
+              GoRoute(
+                path: '/career',
+                builder: (context, state) => const DashboardScreen(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            navigatorKey: _networkKey,
+            routes: [
+              GoRoute(
+                path: '/network',
+                builder: (context, state) => const NetworkScreen(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            navigatorKey: _profileKey,
+            routes: [
+              GoRoute(
+                path: '/profile',
+                builder: (context, state) => const ProfileScreen(),
+              ),
+            ],
+          ),
+        ],
+      ),
+
+      // Full-screen detail routes (cover the shell / bottom nav).
       GoRoute(
-        path: '/dashboard',
-        builder: (context, state) => const DashboardScreen(),
+        path: '/job/:id',
+        parentNavigatorKey: _rootKey,
+        builder: (context, state) =>
+            JobDetailScreen(jobId: state.pathParameters['id']!),
+      ),
+      GoRoute(
+        path: '/saved-jobs',
+        parentNavigatorKey: _rootKey,
+        builder: (context, state) => const SavedJobsScreen(),
       ),
       GoRoute(
         path: '/career-path/:id',
-        builder: (context, state) {
-          final pathId = state.pathParameters['id']!;
-          return CareerPathScreen(careerPathId: pathId);
-        },
+        parentNavigatorKey: _rootKey,
+        builder: (context, state) =>
+            CareerPathScreen(careerPathId: state.pathParameters['id']!),
       ),
       GoRoute(
         path: '/milestone/:id',
+        parentNavigatorKey: _rootKey,
         builder: (context, state) {
-          final milestoneId = state.pathParameters['id']!;
           final extra = state.extra as Map<String, dynamic>?;
           return MilestoneDetailScreen(
-            milestoneId: milestoneId,
+            milestoneId: state.pathParameters['id']!,
             careerPathId: extra?['careerPathId'] ?? '',
           );
         },
       ),
       GoRoute(
-        path: '/profile',
-        builder: (context, state) => const ProfileScreen(),
-      ),
-      GoRoute(
         path: '/analytics',
+        parentNavigatorKey: _rootKey,
         builder: (context, state) => const AnalyticsScreen(),
       ),
       GoRoute(
         path: '/achievements',
+        parentNavigatorKey: _rootKey,
         builder: (context, state) => const AchievementsScreen(),
       ),
       GoRoute(
         path: '/skills',
+        parentNavigatorKey: _rootKey,
         builder: (context, state) => const SkillsScreen(),
       ),
       GoRoute(
         path: '/settings',
+        parentNavigatorKey: _rootKey,
         builder: (context, state) => const SettingsScreen(),
       ),
     ],

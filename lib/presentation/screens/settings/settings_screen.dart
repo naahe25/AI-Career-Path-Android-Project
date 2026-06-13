@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_dimensions.dart';
 import '../../../providers/settings_provider.dart';
 import '../../../providers/auth_provider.dart';
 
 class SettingsScreen extends ConsumerWidget {
-  const SettingsScreen({Key? key}) : super(key: key);
+  const SettingsScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -124,7 +123,7 @@ class SettingsScreen extends ConsumerWidget {
                   icon: const Icon(Icons.logout),
                   label: const Text('Sign Out'),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.red.withOpacity(0.2),
+                    backgroundColor: Colors.red.withValues(alpha: 0.2),
                     foregroundColor: Colors.red,
                     padding: const EdgeInsets.symmetric(vertical: 14),
                   ),
@@ -147,8 +146,8 @@ class SettingsScreen extends ConsumerWidget {
         padding: const EdgeInsets.all(AppDimensions.paddingM),
         margin: const EdgeInsets.only(bottom: AppDimensions.paddingM),
         decoration: BoxDecoration(
-          color: AppColors.backgroundCard.withOpacity(0.5),
-          border: Border.all(color: AppColors.textMuted.withOpacity(0.2)),
+          color: AppColors.backgroundCard.withValues(alpha: 0.5),
+          border: Border.all(color: AppColors.textMuted.withValues(alpha: 0.2)),
           borderRadius: BorderRadius.circular(AppDimensions.radiusM),
         ),
         child: Row(
@@ -191,8 +190,8 @@ class SettingsScreen extends ConsumerWidget {
       padding: const EdgeInsets.all(AppDimensions.paddingM),
       margin: const EdgeInsets.only(bottom: AppDimensions.paddingM),
       decoration: BoxDecoration(
-        color: AppColors.backgroundCard.withOpacity(0.5),
-        border: Border.all(color: AppColors.textMuted.withOpacity(0.2)),
+        color: AppColors.backgroundCard.withValues(alpha: 0.5),
+        border: Border.all(color: AppColors.textMuted.withValues(alpha: 0.2)),
         borderRadius: BorderRadius.circular(AppDimensions.radiusM),
       ),
       child: Row(
@@ -209,7 +208,7 @@ class SettingsScreen extends ConsumerWidget {
           Switch(
             value: value,
             onChanged: onChanged,
-            activeColor: AppColors.primary,
+            activeThumbColor: AppColors.primary,
           ),
         ],
       ),
@@ -234,7 +233,7 @@ class SettingsScreen extends ConsumerWidget {
             padding: EdgeInsets.all(16.0),
             child: Text('Select Theme'),
           ),
-          ...['system', 'light', 'dark'].map(
+          ...[' system', 'light', 'dark'].map(
             (theme) => ListTile(
               title: Text(theme.toUpperCase()),
               trailing: settings.theme == theme
@@ -269,7 +268,7 @@ class SettingsScreen extends ConsumerWidget {
             padding: EdgeInsets.all(16.0),
             child: Text('Privacy Level'),
           ),
-          ...['private', 'friends', 'public'].map(
+          ...[' private', 'friends', 'public'].map(
             (level) => ListTile(
               title: Text(level.toUpperCase()),
               trailing: settings.privacyLevel == level
@@ -298,12 +297,9 @@ class SettingsScreen extends ConsumerWidget {
             child: const Text('Cancel'),
           ),
           TextButton(
-            onPressed: () async {
-              await ref.read(authServiceProvider).signOut();
-              if (context.mounted) {
-                Navigator.pop(context);
-                context.go('/login');
-              }
+            onPressed: () {
+              ref.read(authStateProvider);
+              Navigator.pop(context);
             },
             child: const Text('Sign Out', style: TextStyle(color: Colors.red)),
           ),

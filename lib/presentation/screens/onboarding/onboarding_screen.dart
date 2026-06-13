@@ -80,7 +80,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
         'desired_field': _desiredFieldController.text.trim(),
       });
 
-      if (mounted) context.go('/dashboard');
+      if (mounted) context.go('/home');
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -114,7 +114,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                     vertical: 6,
                   ),
                   decoration: BoxDecoration(
-                    color: AppColors.primary.withOpacity(0.1),
+                    color: AppColors.primary.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(100),
                   ),
                   child: const Text(
@@ -179,7 +179,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                     color: AppColors.backgroundSurface,
                     borderRadius: BorderRadius.circular(AppDimensions.radiusM),
                     border: Border.all(
-                      color: const Color(0xFF2A2A45),
+                      color: AppColors.border,
                       width: 1,
                     ),
                   ),
@@ -336,9 +336,9 @@ class _SkillChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: AppColors.primary.withOpacity(0.1),
+        color: AppColors.primary.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(100),
-        border: Border.all(color: AppColors.primary.withOpacity(0.3), width: 1),
+        border: Border.all(color: AppColors.primary.withValues(alpha: 0.3), width: 1),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,

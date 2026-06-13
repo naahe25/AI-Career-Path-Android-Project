@@ -5,7 +5,7 @@ import '../../../core/constants/app_dimensions.dart';
 import '../../../providers/skill_provider.dart';
 
 class SkillsScreen extends ConsumerWidget {
-  const SkillsScreen({Key? key}) : super(key: key);
+  const SkillsScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -128,8 +128,8 @@ class SkillsScreen extends ConsumerWidget {
       padding: const EdgeInsets.all(AppDimensions.paddingM),
       margin: const EdgeInsets.only(bottom: AppDimensions.paddingM),
       decoration: BoxDecoration(
-        color: AppColors.backgroundCard.withOpacity(0.5),
-        border: Border.all(color: AppColors.textMuted.withOpacity(0.2)),
+        color: AppColors.backgroundCard.withValues(alpha: 0.5),
+        border: Border.all(color: AppColors.textMuted.withValues(alpha: 0.2)),
         borderRadius: BorderRadius.circular(AppDimensions.radiusM),
       ),
       child: Column(
@@ -183,8 +183,8 @@ class SkillsScreen extends ConsumerWidget {
         padding: const EdgeInsets.all(AppDimensions.paddingM),
         margin: const EdgeInsets.only(bottom: AppDimensions.paddingM),
         decoration: BoxDecoration(
-          color: AppColors.primary.withOpacity(0.1),
-          border: Border.all(color: AppColors.primary.withOpacity(0.3)),
+          color: AppColors.primary.withValues(alpha: 0.1),
+          border: Border.all(color: AppColors.primary.withValues(alpha: 0.3)),
           borderRadius: BorderRadius.circular(AppDimensions.radiusM),
         ),
         child: Row(

@@ -1,11 +1,10 @@
-import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/achievement_model.dart';
 import '../../core/exceptions/app_exceptions.dart';
 import '../../core/utils/logger.dart';
 import 'supabase_service.dart';
 
 class AchievementService {
-  SupabaseClient get _client => SupabaseService.client;
+  final _client = SupabaseService.client;
 
   Future<List<AchievementModel>> getAllAchievements() async {
     try {

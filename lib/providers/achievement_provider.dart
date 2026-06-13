@@ -26,7 +26,7 @@ class AchievementNotifier extends StateNotifier<AsyncValue<List<UserAchievementM
 
     try {
       state = const AsyncValue.loading();
-      final achievements = await _service.getUserAchievements(_userId!);
+      final achievements = await _service.getUserAchievements(_userId);
       state = AsyncValue.data(achievements);
     } catch (e, st) {
       state = AsyncValue.error(e, st);
@@ -36,7 +36,7 @@ class AchievementNotifier extends StateNotifier<AsyncValue<List<UserAchievementM
   Future<void> earnAchievement(String achievementId) async {
     if (_userId == null) return;
     try {
-      await _service.earnAchievement(_userId!, achievementId);
+      await _service.earnAchievement(_userId, achievementId);
       await _loadAchievements();
     } catch (e, st) {
       state = AsyncValue.error(e, st);
@@ -45,7 +45,7 @@ class AchievementNotifier extends StateNotifier<AsyncValue<List<UserAchievementM
 
   Future<bool> hasAchievement(String achievementId) async {
     if (_userId == null) return false;
-    return _service.hasAchievement(_userId!, achievementId);
+    return _service.hasAchievement(_userId, achievementId);
   }
 }
 

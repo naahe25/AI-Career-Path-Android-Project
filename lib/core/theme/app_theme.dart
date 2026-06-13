@@ -6,12 +6,14 @@ import '../constants/app_dimensions.dart';
 class AppTheme {
   AppTheme._();
 
-  static ThemeData get darkTheme {
-    return ThemeData(
-      brightness: Brightness.dark,
+  /// Modern, classy light theme with soft 3D surfaces.
+  static ThemeData get lightTheme {
+    final base = ThemeData(
+      brightness: Brightness.light,
       scaffoldBackgroundColor: AppColors.backgroundDark,
       primaryColor: AppColors.primary,
-      colorScheme: const ColorScheme.dark(
+      useMaterial3: true,
+      colorScheme: const ColorScheme.light(
         primary: AppColors.primary,
         secondary: AppColors.secondary,
         surface: AppColors.backgroundCard,
@@ -21,61 +23,64 @@ class AppTheme {
         onSurface: AppColors.textPrimary,
         onError: AppColors.textOnPrimary,
       ),
-      textTheme: GoogleFonts.spaceGroteskTextTheme(
-        const TextTheme(
-          displayLarge: TextStyle(
-            fontSize: 32,
-            fontWeight: FontWeight.w700,
-            color: AppColors.textPrimary,
-            letterSpacing: -0.5,
-          ),
-          displayMedium: TextStyle(
-            fontSize: 28,
-            fontWeight: FontWeight.w700,
-            color: AppColors.textPrimary,
-            letterSpacing: -0.3,
-          ),
-          displaySmall: TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.w600,
-            color: AppColors.textPrimary,
-          ),
-          headlineLarge: TextStyle(
-            fontSize: 22,
-            fontWeight: FontWeight.w600,
-            color: AppColors.textPrimary,
-          ),
-          headlineMedium: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-            color: AppColors.textPrimary,
-          ),
-          headlineSmall: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-            color: AppColors.textPrimary,
-          ),
-          bodyLarge: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w400,
-            color: AppColors.textPrimary,
-          ),
-          bodyMedium: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w400,
-            color: AppColors.textSecondary,
-          ),
-          bodySmall: TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.w400,
-            color: AppColors.textMuted,
-          ),
-          labelLarge: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-            color: AppColors.textPrimary,
-            letterSpacing: 0.5,
-          ),
+      splashColor: AppColors.primary.withValues(alpha: 0.08),
+      highlightColor: AppColors.primary.withValues(alpha: 0.04),
+    );
+
+    return base.copyWith(
+      textTheme: GoogleFonts.plusJakartaSansTextTheme(base.textTheme).copyWith(
+        displayLarge: const TextStyle(
+          fontSize: 32,
+          fontWeight: FontWeight.w800,
+          color: AppColors.textPrimary,
+          letterSpacing: -0.5,
+        ),
+        displayMedium: const TextStyle(
+          fontSize: 28,
+          fontWeight: FontWeight.w800,
+          color: AppColors.textPrimary,
+          letterSpacing: -0.3,
+        ),
+        displaySmall: const TextStyle(
+          fontSize: 24,
+          fontWeight: FontWeight.w700,
+          color: AppColors.textPrimary,
+        ),
+        headlineLarge: const TextStyle(
+          fontSize: 22,
+          fontWeight: FontWeight.w700,
+          color: AppColors.textPrimary,
+        ),
+        headlineMedium: const TextStyle(
+          fontSize: 18,
+          fontWeight: FontWeight.w700,
+          color: AppColors.textPrimary,
+        ),
+        headlineSmall: const TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.w700,
+          color: AppColors.textPrimary,
+        ),
+        bodyLarge: const TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.w500,
+          color: AppColors.textPrimary,
+        ),
+        bodyMedium: const TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.w500,
+          color: AppColors.textSecondary,
+        ),
+        bodySmall: const TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.w500,
+          color: AppColors.textMuted,
+        ),
+        labelLarge: const TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.w700,
+          color: AppColors.textPrimary,
+          letterSpacing: 0.3,
         ),
       ),
       cardTheme: CardThemeData(
@@ -94,7 +99,7 @@ class AppTheme {
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppDimensions.radiusM),
-          borderSide: const BorderSide(color: Color(0xFF2A2A45), width: 1),
+          borderSide: const BorderSide(color: AppColors.border, width: 1),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppDimensions.radiusM),
@@ -123,10 +128,11 @@ class AppTheme {
             borderRadius: BorderRadius.circular(AppDimensions.radiusRound),
           ),
           elevation: 0,
+          shadowColor: Colors.transparent,
           textStyle: const TextStyle(
             fontSize: 16,
-            fontWeight: FontWeight.w600,
-            letterSpacing: 0.5,
+            fontWeight: FontWeight.w700,
+            letterSpacing: 0.3,
           ),
         ),
       ),
@@ -138,18 +144,19 @@ class AppTheme {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppDimensions.radiusRound),
           ),
-          textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+          textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
         ),
       ),
       appBarTheme: const AppBarTheme(
         backgroundColor: AppColors.backgroundDark,
         elevation: 0,
         scrolledUnderElevation: 0,
+        centerTitle: false,
         iconTheme: IconThemeData(color: AppColors.textPrimary),
         titleTextStyle: TextStyle(
           color: AppColors.textPrimary,
           fontSize: 18,
-          fontWeight: FontWeight.w600,
+          fontWeight: FontWeight.w700,
         ),
       ),
       bottomNavigationBarTheme: const BottomNavigationBarThemeData(
@@ -158,19 +165,38 @@ class AppTheme {
         unselectedItemColor: AppColors.textMuted,
         showUnselectedLabels: true,
         type: BottomNavigationBarType.fixed,
+        elevation: 0,
       ),
       dividerTheme: const DividerThemeData(
-        color: Color(0xFF2A2A45),
+        color: AppColors.border,
         thickness: 1,
       ),
+      chipTheme: ChipThemeData(
+        backgroundColor: AppColors.backgroundSurface,
+        side: BorderSide.none,
+        labelStyle: const TextStyle(
+          color: AppColors.textSecondary,
+          fontWeight: FontWeight.w600,
+          fontSize: 13,
+        ),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppDimensions.radiusRound),
+        ),
+      ),
       snackBarTheme: SnackBarThemeData(
-        backgroundColor: AppColors.backgroundElevated,
-        contentTextStyle: const TextStyle(color: AppColors.textPrimary),
+        backgroundColor: AppColors.textPrimary,
+        contentTextStyle: const TextStyle(color: Colors.white),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppDimensions.radiusM),
         ),
         behavior: SnackBarBehavior.floating,
       ),
+      progressIndicatorTheme: const ProgressIndicatorThemeData(
+        color: AppColors.primary,
+      ),
     );
   }
+
+  /// Kept for backwards-compatibility with any code referencing the old name.
+  static ThemeData get darkTheme => lightTheme;
 }

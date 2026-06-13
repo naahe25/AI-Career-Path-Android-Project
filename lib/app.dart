@@ -13,7 +13,7 @@ class App extends ConsumerWidget {
     return MaterialApp.router(
       title: 'AI Career Path',
       debugShowCheckedModeBanner: false,
-      theme: AppTheme.darkTheme,
+      theme: AppTheme.lightTheme,
       routerConfig: router,
     );
   }

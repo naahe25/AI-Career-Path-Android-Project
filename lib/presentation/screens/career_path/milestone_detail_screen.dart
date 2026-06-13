@@ -129,8 +129,8 @@ class _MilestoneContent extends ConsumerWidget {
                 ),
                 decoration: BoxDecoration(
                   color: milestone.isCompleted
-                      ? AppColors.success.withOpacity(0.15)
-                      : AppColors.primary.withOpacity(0.15),
+                      ? AppColors.success.withValues(alpha: 0.15)
+                      : AppColors.primary.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(100),
                   border: Border.all(
                     color: milestone.isCompleted
@@ -193,7 +193,7 @@ class _MilestoneContent extends ConsumerWidget {
                   vertical: 6,
                 ),
                 decoration: BoxDecoration(
-                  color: AppColors.info.withOpacity(0.1),
+                  color: AppColors.info.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(100),
                 ),
                 child: Row(
@@ -261,10 +261,10 @@ class _MilestoneContent extends ConsumerWidget {
                       vertical: 6,
                     ),
                     decoration: BoxDecoration(
-                      color: AppColors.secondary.withOpacity(0.1),
+                      color: AppColors.secondary.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(100),
                       border: Border.all(
-                        color: AppColors.secondary.withOpacity(0.3),
+                        color: AppColors.secondary.withValues(alpha: 0.3),
                         width: 1,
                       ),
                     ),
@@ -337,7 +337,7 @@ class _MilestoneContent extends ConsumerWidget {
                             AppDimensions.radiusM,
                           ),
                           border: Border.all(
-                            color: const Color(0xFF2A2A45),
+                            color: AppColors.border,
                             width: 1,
                           ),
                         ),
@@ -347,7 +347,7 @@ class _MilestoneContent extends ConsumerWidget {
                               width: 40,
                               height: 40,
                               decoration: BoxDecoration(
-                                color: AppColors.primary.withOpacity(0.1),
+                                color: AppColors.primary.withValues(alpha: 0.1),
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               child: Icon(

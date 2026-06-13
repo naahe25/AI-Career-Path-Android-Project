@@ -40,7 +40,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
-      if (mounted) context.go('/dashboard');
+      if (mounted) context.go('/home');
     } on AuthException catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -186,7 +186,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   children: [
                     Expanded(
                       child: Divider(
-                        color: AppColors.textMuted.withOpacity(0.25),
+                        color: AppColors.textMuted.withValues(alpha: 0.25),
                       ),
                     ),
                     const Padding(
@@ -201,7 +201,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     ),
                     Expanded(
                       child: Divider(
-                        color: AppColors.textMuted.withOpacity(0.25),
+                        color: AppColors.textMuted.withValues(alpha: 0.25),
                       ),
                     ),
                   ],
@@ -292,26 +292,24 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               onPressed: () async {
                 final email = emailController.text.trim();
                 if (email.isEmpty) return;
+                final messenger = ScaffoldMessenger.of(context);
+                final navigator = Navigator.of(dialogContext);
                 try {
                   await AuthService().resetPassword(email);
-                  if (mounted) {
-                    Navigator.pop(dialogContext);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Password reset email sent.'),
-                        backgroundColor: AppColors.success,
-                      ),
-                    );
-                  }
+                  navigator.pop();
+                  messenger.showSnackBar(
+                    const SnackBar(
+                      content: Text('Password reset email sent.'),
+                      backgroundColor: AppColors.success,
+                    ),
+                  );
                 } catch (e) {
-                  if (mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('Reset failed: $e'),
-                        backgroundColor: AppColors.error,
-                      ),
-                    );
-                  }
+                  messenger.showSnackBar(
+                    SnackBar(
+                      content: Text('Reset failed: $e'),
+                      backgroundColor: AppColors.error,
+                    ),
+                  );
                 }
               },
               child: const Text('Send'),
@@ -336,7 +334,7 @@ class _OAuthButton extends StatelessWidget {
       style: OutlinedButton.styleFrom(
         minimumSize: const Size(0, 48),
         padding: const EdgeInsets.symmetric(horizontal: 6),
-        side: const BorderSide(color: Color(0xFF2A2A45)),
+        side: const BorderSide(color: AppColors.border),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppDimensions.radiusM),
         ),

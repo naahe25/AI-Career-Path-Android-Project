@@ -40,7 +40,6 @@ class AiService {
     // Make the app usable even when Edge/AI service is temporarily unavailable.
     // The UI will still work using fallback demo paths.
     try {
-      final session = SupabaseService.auth.currentSession;
 
       final response = await SupabaseService.client.functions.invoke(
         'generate-career-path',

@@ -25,7 +25,7 @@ class SplashScreen extends StatelessWidget {
                     borderRadius: BorderRadius.circular(24),
                     boxShadow: [
                       BoxShadow(
-                        color: AppColors.primary.withOpacity(0.4),
+                        color: AppColors.primary.withValues(alpha: 0.4),
                         blurRadius: 30,
                         spreadRadius: 5,
                       ),

@@ -1,8 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import '../core/config/app_config.dart';
 import '../data/models/profile_model.dart';
-import '../data/demo/demo_data.dart';
 import '../data/services/auth_service.dart';
 import '../core/utils/logger.dart';
 
@@ -33,9 +31,7 @@ class ProfileNotifier extends StateNotifier<AsyncValue<ProfileModel?>> {
 
   ProfileNotifier(this._authService, this._userId)
     : super(const AsyncValue.loading()) {
-    if (AppConfig.demoMode) {
-      state = AsyncValue.data(DemoData.profile());
-    } else if (_userId != null) {
+    if (_userId != null) {
       loadProfile();
     } else {
       state = const AsyncValue.data(null);
@@ -43,10 +39,6 @@ class ProfileNotifier extends StateNotifier<AsyncValue<ProfileModel?>> {
   }
 
   Future<void> loadProfile() async {
-    if (AppConfig.demoMode) {
-      state = AsyncValue.data(DemoData.profile());
-      return;
-    }
     if (_userId == null) return;
     try {
       state = const AsyncValue.loading();
@@ -59,23 +51,6 @@ class ProfileNotifier extends StateNotifier<AsyncValue<ProfileModel?>> {
   }
 
   Future<void> updateProfile(Map<String, dynamic> updates) async {
-    if (AppConfig.demoMode) {
-      final current = state.value ?? DemoData.profile();
-      state = AsyncValue.data(
-        current.copyWith(
-          fullName: updates['full_name'] as String?,
-          avatarUrl: updates['avatar_url'] as String?,
-          currentSkills: (updates['current_skills'] as List<dynamic>?)
-              ?.map((skill) => skill.toString())
-              .toList(),
-          educationLevel: updates['education_level'] as String?,
-          yearsOfExperience: updates['years_of_experience'] as int?,
-          currentRole: updates['user_current_role'] as String?,
-          desiredField: updates['desired_field'] as String?,
-        ),
-      );
-      return;
-    }
     if (_userId == null) return;
     try {
       final updated = await _authService.updateProfile(_userId, updates);
@@ -89,10 +64,6 @@ class ProfileNotifier extends StateNotifier<AsyncValue<ProfileModel?>> {
 
 final profileProvider =
     StateNotifierProvider<ProfileNotifier, AsyncValue<ProfileModel?>>((ref) {
-      if (AppConfig.demoMode) {
-        final authService = ref.watch(authServiceProvider);
-        return ProfileNotifier(authService, AppConfig.demoUserId);
-      }
       final user = ref.watch(currentUserProvider);
       final authService = ref.watch(authServiceProvider);
       return ProfileNotifier(authService, user?.id);

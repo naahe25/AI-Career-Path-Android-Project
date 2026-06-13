@@ -5,16 +5,14 @@ import '../../../core/constants/app_dimensions.dart';
 import '../../../providers/analytics_provider.dart';
 import '../../../providers/skill_provider.dart';
 import '../../../providers/achievement_provider.dart';
-import '../../widgets/common/loading_overlay.dart';
 import '../../widgets/analytics/analytics_widgets.dart';
 
 class AnalyticsScreen extends ConsumerWidget {
-  const AnalyticsScreen({Key? key}) : super(key: key);
+  const AnalyticsScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final analyticsAsync = ref.watch(analyticsNotifierProvider);
-    final dailyProgressAsync = ref.watch(dailyProgressProvider);
     final skillCountAsync = ref.watch(userSkillCountProvider);
     final completedSkillsAsync = ref.watch(completedSkillCountProvider);
     final achievementsAsync = ref.watch(achievementNotifierProvider);
@@ -146,9 +144,9 @@ class AnalyticsScreen extends ConsumerWidget {
                   Container(
                     padding: const EdgeInsets.all(AppDimensions.paddingM),
                     decoration: BoxDecoration(
-                      color: AppColors.backgroundCard.withOpacity(0.5),
+                      color: AppColors.backgroundCard.withValues(alpha: 0.5),
                       border: Border.all(
-                        color: AppColors.primary.withOpacity(0.2),
+                        color: AppColors.primary.withValues(alpha: 0.2),
                       ),
                       borderRadius: BorderRadius.circular(
                         AppDimensions.radiusL,

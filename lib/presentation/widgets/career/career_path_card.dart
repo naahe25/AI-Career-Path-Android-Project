@@ -41,7 +41,7 @@ class CareerPathCard extends StatelessWidget {
               ),
               borderRadius: BorderRadius.circular(AppDimensions.radiusL),
               border: Border.all(
-                color: AppColors.primary.withOpacity(0.2),
+                color: AppColors.primary.withValues(alpha: 0.2),
                 width: 1,
               ),
             ),
@@ -72,7 +72,7 @@ class CareerPathCard extends StatelessWidget {
                           vertical: 4,
                         ),
                         decoration: BoxDecoration(
-                          color: _difficultyColor.withOpacity(0.15),
+                          color: _difficultyColor.withValues(alpha: 0.15),
                           borderRadius: BorderRadius.circular(
                             AppDimensions.radiusRound,
                           ),

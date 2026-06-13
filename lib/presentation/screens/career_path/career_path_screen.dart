@@ -96,7 +96,7 @@ class _CareerPathContent extends ConsumerWidget {
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
-                      AppColors.primary.withOpacity(0.3),
+                      AppColors.primary.withValues(alpha: 0.3),
                       AppColors.backgroundDark,
                     ],
                     begin: Alignment.topLeft,
@@ -115,7 +115,7 @@ class _CareerPathContent extends ConsumerWidget {
                           vertical: 4,
                         ),
                         decoration: BoxDecoration(
-                          color: _difficultyColor.withOpacity(0.15),
+                          color: _difficultyColor.withValues(alpha: 0.15),
                           borderRadius: BorderRadius.circular(100),
                         ),
                         child: Text(
@@ -340,7 +340,7 @@ class _StatCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.backgroundCard,
         borderRadius: BorderRadius.circular(AppDimensions.radiusM),
-        border: Border.all(color: color.withOpacity(0.2), width: 1),
+        border: Border.all(color: color.withValues(alpha: 0.2), width: 1),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

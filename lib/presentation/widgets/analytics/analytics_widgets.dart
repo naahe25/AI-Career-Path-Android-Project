@@ -10,13 +10,13 @@ class StatsCardWidget extends StatelessWidget {
   final Color? bgColor;
 
   const StatsCardWidget({
-    Key? key,
+    super.key,
     required this.label,
     required this.value,
     required this.unit,
     required this.icon,
     this.bgColor,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -25,12 +25,12 @@ class StatsCardWidget extends StatelessWidget {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            (bgColor ?? AppColors.primary).withOpacity(0.1),
-            (bgColor ?? AppColors.primary).withOpacity(0.05),
+            (bgColor ?? AppColors.primary).withValues(alpha: 0.1),
+            (bgColor ?? AppColors.primary).withValues(alpha: 0.05),
           ],
         ),
         border: Border.all(
-          color: (bgColor ?? AppColors.primary).withOpacity(0.3),
+          color: (bgColor ?? AppColors.primary).withValues(alpha: 0.3),
         ),
         borderRadius: BorderRadius.circular(AppDimensions.radiusL),
       ),
@@ -85,11 +85,11 @@ class StreakWidget extends StatelessWidget {
   final DateTime? lastActivityDate;
 
   const StreakWidget({
-    Key? key,
+    super.key,
     required this.currentStreak,
     required this.longestStreak,
     this.lastActivityDate,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -101,14 +101,14 @@ class StreakWidget extends StatelessWidget {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            AppColors.primary.withOpacity(0.15),
-            AppColors.secondary.withOpacity(0.1),
+            AppColors.primary.withValues(alpha: 0.15),
+            AppColors.secondary.withValues(alpha: 0.1),
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         border: Border.all(
-          color: AppColors.primary.withOpacity(0.3),
+          color: AppColors.primary.withValues(alpha: 0.3),
         ),
         borderRadius: BorderRadius.circular(AppDimensions.radiusL),
       ),
@@ -133,8 +133,8 @@ class StreakWidget extends StatelessWidget {
                     vertical: 4,
                   ),
                   decoration: BoxDecoration(
-                    color: Colors.green.withOpacity(0.2),
-                    border: Border.all(color: Colors.green.withOpacity(0.5)),
+                    color: Colors.green.withValues(alpha: 0.2),
+                    border: Border.all(color: Colors.green.withValues(alpha: 0.5)),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: const Text(
@@ -156,7 +156,7 @@ class StreakWidget extends StatelessWidget {
               Container(
                 height: 50,
                 width: 1,
-                color: AppColors.textMuted.withOpacity(0.2),
+                color: AppColors.textMuted.withValues(alpha: 0.2),
               ),
               _buildStreakInfo('Longest', longestStreak.toString()),
             ],
@@ -196,12 +196,12 @@ class ProgressBarWidget extends StatelessWidget {
   final Color? color;
 
   const ProgressBarWidget({
-    Key? key,
+    super.key,
     required this.progress,
     required this.label,
     required this.progressText,
     this.color,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -234,7 +234,7 @@ class ProgressBarWidget extends StatelessWidget {
           child: LinearProgressIndicator(
             value: progress / 100,
             minHeight: 8,
-            backgroundColor: AppColors.backgroundCard.withOpacity(0.5),
+            backgroundColor: AppColors.backgroundCard.withValues(alpha: 0.5),
             valueColor: AlwaysStoppedAnimation<Color>(
               color ?? AppColors.primary,
             ),

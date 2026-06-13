@@ -42,7 +42,7 @@ class MilestoneTile extends StatelessWidget {
                       border: Border.all(
                         color: milestone.isCompleted
                             ? AppColors.success
-                            : AppColors.primary.withOpacity(0.5),
+                            : AppColors.primary.withValues(alpha: 0.5),
                         width: 2,
                       ),
                     ),
@@ -72,8 +72,8 @@ class MilestoneTile extends StatelessWidget {
                           colors: [
                             milestone.isCompleted
                                 ? AppColors.success
-                                : AppColors.primary.withOpacity(0.3),
-                            AppColors.primary.withOpacity(0.1),
+                                : AppColors.primary.withValues(alpha: 0.3),
+                            AppColors.primary.withValues(alpha: 0.1),
                           ],
                         ),
                       ),
@@ -94,13 +94,13 @@ class MilestoneTile extends StatelessWidget {
                 padding: const EdgeInsets.all(AppDimensions.paddingM),
                 decoration: BoxDecoration(
                   color: milestone.isCompleted
-                      ? AppColors.success.withOpacity(0.08)
+                      ? AppColors.success.withValues(alpha: 0.08)
                       : AppColors.backgroundCard,
                   borderRadius: BorderRadius.circular(AppDimensions.radiusM),
                   border: Border.all(
                     color: milestone.isCompleted
-                        ? AppColors.success.withOpacity(0.3)
-                        : const Color(0xFF2A2A45),
+                        ? AppColors.success.withValues(alpha: 0.3)
+                        : AppColors.border,
                     width: 1,
                   ),
                 ),
@@ -199,7 +199,7 @@ class _Chip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(100),
       ),
       child: Row(

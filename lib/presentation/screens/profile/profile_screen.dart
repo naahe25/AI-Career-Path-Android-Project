@@ -178,10 +178,10 @@ class ProfileScreen extends ConsumerWidget {
                           vertical: 6,
                         ),
                         decoration: BoxDecoration(
-                          color: AppColors.primary.withOpacity(0.1),
+                          color: AppColors.primary.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(100),
                           border: Border.all(
-                            color: AppColors.primary.withOpacity(0.3),
+                            color: AppColors.primary.withValues(alpha: 0.3),
                             width: 1,
                           ),
                         ),
@@ -209,12 +209,12 @@ class ProfileScreen extends ConsumerWidget {
                   child: Container(
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     decoration: BoxDecoration(
-                      color: AppColors.error.withOpacity(0.1),
+                      color: AppColors.error.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(
                         AppDimensions.radiusRound,
                       ),
                       border: Border.all(
-                        color: AppColors.error.withOpacity(0.3),
+                        color: AppColors.error.withValues(alpha: 0.3),
                         width: 1,
                       ),
                     ),
@@ -307,7 +307,7 @@ class _InfoCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.backgroundCard,
         borderRadius: BorderRadius.circular(AppDimensions.radiusM),
-        border: Border.all(color: const Color(0xFF2A2A45), width: 1),
+        border: Border.all(color: AppColors.border, width: 1),
       ),
       child: Row(
         children: [

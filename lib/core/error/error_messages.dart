@@ -1,5 +1,3 @@
-import 'dart:async' as async;
-
 import '../exceptions/app_exceptions.dart';
 
 class ErrorMessages {
@@ -19,7 +17,7 @@ class ErrorMessages {
   static const String offlineError = 'You are offline. Some features may not be available.';
 
   static String getErrorMessage(Object error) {
-    if (error is async.TimeoutException || error is TimeoutException) {
+    if (error is TimeoutException) {
       return timeoutError;
     } else if (error is NetworkException) {
       return networkError;

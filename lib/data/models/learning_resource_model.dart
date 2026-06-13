@@ -78,7 +78,7 @@ class LearningResourceModel {
 
   String get ratingDisplay {
     if (rating == null) return 'No rating';
-    return '${rating!.toStringAsFixed(1)} ⭐ (${reviewsCount} reviews)';
+    return '${rating!.toStringAsFixed(1)} ⭐ ($reviewsCount reviews)';
   }
 }
 

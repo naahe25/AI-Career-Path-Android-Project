@@ -5,7 +5,7 @@ import '../../../core/constants/app_dimensions.dart';
 import '../../../providers/achievement_provider.dart';
 
 class AchievementsScreen extends ConsumerWidget {
-  const AchievementsScreen({Key? key}) : super(key: key);
+  const AchievementsScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -161,18 +161,18 @@ class AchievementsScreen extends ConsumerWidget {
         gradient: earned
             ? LinearGradient(
                 colors: [
-                  AppColors.primary.withOpacity(0.2),
-                  AppColors.primary.withOpacity(0.1),
+                  AppColors.primary.withValues(alpha: 0.2),
+                  AppColors.primary.withValues(alpha: 0.1),
                 ],
               )
             : LinearGradient(
                 colors: [
-                  AppColors.backgroundCard.withOpacity(0.5),
-                  AppColors.backgroundCard.withOpacity(0.3),
+                  AppColors.backgroundCard.withValues(alpha: 0.5),
+                  AppColors.backgroundCard.withValues(alpha: 0.3),
                 ],
               ),
         border: Border.all(
-          color: earned ? AppColors.primary.withOpacity(0.4) : AppColors.textMuted.withOpacity(0.2),
+          color: earned ? AppColors.primary.withValues(alpha: 0.4) : AppColors.textMuted.withValues(alpha: 0.2),
         ),
         borderRadius: BorderRadius.circular(AppDimensions.radiusL),
       ),

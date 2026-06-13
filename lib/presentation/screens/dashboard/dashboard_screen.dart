@@ -125,7 +125,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                               ],
                             ),
                             GestureDetector(
-                              onTap: () => context.push('/profile'),
+                              onTap: () => context.go('/profile'),
                               child: Container(
                                 width: 44,
                                 height: 44,
@@ -157,8 +157,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                                 decoration: BoxDecoration(
                                   gradient: const LinearGradient(
                                     colors: [
-                                      Color(0xFF6C63FF),
-                                      Color(0xFF9D97FF),
+                                      AppColors.primary,
+                                      AppColors.primaryLight,
                                     ],
                                     begin: Alignment.topLeft,
                                     end: Alignment.bottomRight,
@@ -168,7 +168,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                                   ),
                                   boxShadow: [
                                     BoxShadow(
-                                      color: AppColors.primary.withOpacity(0.3),
+                                      color: AppColors.primary.withValues(alpha: 0.3),
                                       blurRadius: 20,
                                       offset: const Offset(0, 8),
                                     ),
@@ -180,7 +180,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                                       width: 48,
                                       height: 48,
                                       decoration: BoxDecoration(
-                                        color: Colors.white.withOpacity(0.2),
+                                        color: Colors.white.withValues(alpha: 0.2),
                                         borderRadius: BorderRadius.circular(12),
                                       ),
                                       child: const Icon(
@@ -325,7 +325,7 @@ class _EmptyState extends StatelessWidget {
           width: 80,
           height: 80,
           decoration: BoxDecoration(
-            color: AppColors.primary.withOpacity(0.1),
+            color: AppColors.primary.withValues(alpha: 0.1),
             shape: BoxShape.circle,
           ),
           child: const Icon(
@@ -569,7 +569,7 @@ class _GeneratedPathCard extends StatelessWidget {
             color: AppColors.backgroundSurface,
             borderRadius: BorderRadius.circular(AppDimensions.radiusL),
             border: Border.all(
-              color: AppColors.primary.withOpacity(0.2),
+              color: AppColors.primary.withValues(alpha: 0.2),
               width: 1,
             ),
           ),
@@ -658,7 +658,7 @@ class _InfoChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(100),
       ),
       child: Row(

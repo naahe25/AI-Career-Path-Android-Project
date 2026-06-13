@@ -1,6 +1,3 @@
-import 'dart:async' as async;
-import 'dart:io' as io;
-
 import '../exceptions/app_exceptions.dart';
 import '../utils/logger.dart';
 
@@ -12,7 +9,7 @@ class ErrorHandler {
       return error;
     }
 
-    if (error is async.TimeoutException) {
+    if (error is TimeoutException) {
       return TimeoutException(
         message: 'Request timed out. Please try again.',
         originalException: error,
@@ -26,7 +23,7 @@ class ErrorHandler {
       );
     }
 
-    if (error is io.SocketException) {
+    if (error is SocketException) {
       return NetworkException(
         message: 'Network connection failed.',
         originalException: error,
@@ -60,4 +57,10 @@ class ErrorHandler {
     }
     return 'An unexpected error occurred. Please try again.';
   }
+}
+
+// For imports
+class SocketException implements Exception {
+  final String message;
+  SocketException(this.message);
 }

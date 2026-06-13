@@ -5,7 +5,7 @@ import '../../core/utils/logger.dart';
 import 'supabase_service.dart';
 
 class AnalyticsService {
-  SupabaseClient get _client => SupabaseService.client;
+  final _client = SupabaseService.client;
 
   Future<AnalyticsModel?> getUserAnalytics(String userId) async {
     try {

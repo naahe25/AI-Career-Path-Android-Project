@@ -21,8 +21,8 @@ class SettingsNotifier extends StateNotifier<AsyncValue<UserSettingsModel>> {
 
     try {
       state = const AsyncValue.loading();
-      var settings = await _service.getUserSettings(_userId!);
-      settings ??= await _service.initializeSettings(_userId!);
+      var settings = await _service.getUserSettings(_userId);
+      settings ??= await _service.initializeSettings(_userId);
       state = AsyncValue.data(settings);
     } catch (e, st) {
       state = AsyncValue.error(e, st);
@@ -32,7 +32,7 @@ class SettingsNotifier extends StateNotifier<AsyncValue<UserSettingsModel>> {
   Future<void> updateSettings(UserSettingsModel settings) async {
     if (_userId == null) return;
     try {
-      await _service.updateSettings(_userId!, settings);
+      await _service.updateSettings(_userId, settings);
       state = AsyncValue.data(settings);
     } catch (e, st) {
       state = AsyncValue.error(e, st);
@@ -42,7 +42,7 @@ class SettingsNotifier extends StateNotifier<AsyncValue<UserSettingsModel>> {
   Future<void> updateTheme(String theme) async {
     if (_userId == null) return;
     try {
-      await _service.updateTheme(_userId!, theme);
+      await _service.updateTheme(_userId, theme);
       final current = state.value;
       if (current != null) {
         state = AsyncValue.data(current.copyWith(theme: theme));
@@ -61,7 +61,7 @@ class SettingsNotifier extends StateNotifier<AsyncValue<UserSettingsModel>> {
     if (_userId == null) return;
     try {
       await _service.updateNotificationPreferences(
-        _userId!,
+        _userId,
         enabled: enabled,
         emailNotifications: emailNotifications,
         pushNotifications: pushNotifications,
@@ -76,7 +76,7 @@ class SettingsNotifier extends StateNotifier<AsyncValue<UserSettingsModel>> {
   Future<void> updatePrivacy(String level) async {
     if (_userId == null) return;
     try {
-      await _service.updatePrivacy(_userId!, level);
+      await _service.updatePrivacy(_userId, level);
       await _loadSettings();
     } catch (e, st) {
       state = AsyncValue.error(e, st);
@@ -86,7 +86,7 @@ class SettingsNotifier extends StateNotifier<AsyncValue<UserSettingsModel>> {
   Future<void> updateLanguage(String language) async {
     if (_userId == null) return;
     try {
-      await _service.updateLanguage(_userId!, language);
+      await _service.updateLanguage(_userId, language);
       await _loadSettings();
     } catch (e, st) {
       state = AsyncValue.error(e, st);

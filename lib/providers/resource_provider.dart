@@ -47,7 +47,7 @@ class ResourceNotifier extends StateNotifier<AsyncValue<List<UserResourceModel>>
   Future<void> bookmarkResource(String resourceId) async {
     if (_userId == null) return;
     try {
-      await _service.bookmarkResource(_userId!, resourceId);
+      await _service.bookmarkResource(_userId, resourceId);
     } catch (e, st) {
       state = AsyncValue.error(e, st);
     }
@@ -56,7 +56,7 @@ class ResourceNotifier extends StateNotifier<AsyncValue<List<UserResourceModel>>
   Future<void> unbookmarkResource(String resourceId) async {
     if (_userId == null) return;
     try {
-      await _service.unbookmarkResource(_userId!, resourceId);
+      await _service.unbookmarkResource(_userId, resourceId);
     } catch (e, st) {
       state = AsyncValue.error(e, st);
     }
@@ -65,7 +65,7 @@ class ResourceNotifier extends StateNotifier<AsyncValue<List<UserResourceModel>>
   Future<void> completeResource(String resourceId, {String? notes}) async {
     if (_userId == null) return;
     try {
-      await _service.completeResource(_userId!, resourceId, notes: notes);
+      await _service.completeResource(_userId, resourceId, notes: notes);
     } catch (e, st) {
       state = AsyncValue.error(e, st);
     }
