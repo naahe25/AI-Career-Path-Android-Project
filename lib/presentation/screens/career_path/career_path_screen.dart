@@ -76,6 +76,51 @@ class _CareerPathContent extends ConsumerWidget {
     }
   }
 
+  Future<void> _confirmRemove(BuildContext context, WidgetRef ref) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppColors.backgroundCard,
+        title: const Text('Remove path?'),
+        content: Text(
+          'Remove "${path.title}" from your career paths? '
+          'You can generate and add it again later.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child:
+                const Text('Remove', style: TextStyle(color: AppColors.error)),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !context.mounted) return;
+    final messenger = ScaffoldMessenger.of(context);
+    final router = GoRouter.of(context);
+    try {
+      await ref.read(careerPathsProvider.notifier).removeCareerPath(path.id);
+      router.pop();
+      messenger.showSnackBar(
+        const SnackBar(
+          content: Text('Path removed.'),
+          backgroundColor: AppColors.info,
+        ),
+      );
+    } catch (_) {
+      messenger.showSnackBar(
+        const SnackBar(
+          content: Text('Could not remove the path. Please try again.'),
+          backgroundColor: AppColors.error,
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
@@ -91,6 +136,14 @@ class _CareerPathContent extends ConsumerWidget {
               onPressed: () => context.pop(),
               icon: const Icon(Icons.arrow_back_ios, size: 20),
             ),
+            actions: [
+              IconButton(
+                tooltip: 'Remove path',
+                onPressed: () => _confirmRemove(context, ref),
+                icon: const Icon(Icons.delete_outline,
+                    color: AppColors.error, size: 22),
+              ),
+            ],
             flexibleSpace: FlexibleSpaceBar(
               background: Container(
                 decoration: BoxDecoration(

@@ -1,9 +1,13 @@
+import 'dart:typed_data';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_dimensions.dart';
 import '../../../data/models/job_model.dart';
+import '../../../providers/auth_provider.dart';
 import '../../../providers/job_provider.dart';
 import '../../widgets/common/neo_card.dart';
 
@@ -56,6 +60,8 @@ class _JobDetailBody extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final applied = ref.watch(appliedJobIdsProvider).contains(job.id);
+    final currentUserId = ref.watch(currentUserProvider)?.id;
+    final isOwner = job.postedBy != null && job.postedBy == currentUserId;
 
     return Column(
       children: [
@@ -223,29 +229,128 @@ class _JobDetailBody extends ConsumerWidget {
             color: AppColors.backgroundCard,
             boxShadow: AppShadows.soft,
           ),
-          child: GradientButton(
-            label: applied ? 'Application submitted' : 'Apply now',
-            icon: applied ? Icons.check_circle : Icons.send_rounded,
-            gradient:
-                applied ? AppColors.successGradient : AppColors.primaryGradient,
-            onTap: applied ? null : () => _confirmApply(context, ref),
-          ),
+          child: isOwner
+              ? GradientButton(
+                  label: 'View applicants',
+                  icon: Icons.groups_outlined,
+                  gradient: AppColors.infoGradient,
+                  onTap: () => context.push('/job/${job.id}/applicants'),
+                )
+              : GradientButton(
+                  label: applied ? 'Application submitted' : 'Apply now',
+                  icon: applied ? Icons.check_circle : Icons.send_rounded,
+                  gradient: applied
+                      ? AppColors.successGradient
+                      : AppColors.primaryGradient,
+                  onTap: applied ? null : () => _openApplySheet(context),
+                ),
         ),
       ],
     );
   }
 
-  Future<void> _confirmApply(BuildContext context, WidgetRef ref) async {
-    final messenger = ScaffoldMessenger.of(context);
+  void _openApplySheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => _ApplySheet(job: job),
+    );
+  }
+}
+
+/// LinkedIn-style "Easy Apply" sheet: an (optional) cover note and a REQUIRED
+/// CV upload (PDF or Word).
+class _ApplySheet extends ConsumerStatefulWidget {
+  final JobModel job;
+  const _ApplySheet({required this.job});
+
+  @override
+  ConsumerState<_ApplySheet> createState() => _ApplySheetState();
+}
+
+class _ApplySheetState extends ConsumerState<_ApplySheet> {
+  final _note = TextEditingController();
+  Uint8List? _cvBytes;
+  String? _cvName;
+  String _cvExt = 'pdf';
+  bool _submitting = false;
+
+  @override
+  void dispose() {
+    _note.dispose();
+    super.dispose();
+  }
+
+  Future<void> _pickCv() async {
     try {
-      await ref.read(appliedJobIdsProvider.notifier).apply(job.id);
+      final result = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: const ['pdf', 'doc', 'docx'],
+        withData: true,
+      );
+      if (result == null || result.files.isEmpty) return;
+      final file = result.files.first;
+      final bytes = file.bytes;
+      if (bytes == null) return;
+      setState(() {
+        _cvBytes = bytes;
+        _cvName = file.name;
+        _cvExt = (file.extension ?? 'pdf').toLowerCase();
+      });
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Could not open the file picker.'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
+    }
+  }
+
+  Future<void> _submit() async {
+    final messenger = ScaffoldMessenger.of(context);
+    if (_cvBytes == null) {
+      messenger.showSnackBar(
+        const SnackBar(
+          content: Text('Please attach your CV to apply.'),
+          backgroundColor: AppColors.warning,
+        ),
+      );
+      return;
+    }
+    final userId = ref.read(currentUserProvider)?.id;
+    if (userId == null) return;
+    final profile = ref.read(profileProvider).value;
+
+    setState(() => _submitting = true);
+    final navigator = Navigator.of(context);
+    try {
+      final cvUrl = await ref.read(jobServiceProvider).uploadCv(
+            userId,
+            _cvBytes!,
+            _cvName ?? 'cv.$_cvExt',
+            extension: _cvExt,
+          );
+      await ref.read(appliedJobIdsProvider.notifier).apply(
+            widget.job.id,
+            coverNote: _note.text.trim().isEmpty ? null : _note.text.trim(),
+            cvUrl: cvUrl,
+            cvName: _cvName ?? 'CV',
+            applicant: profile,
+          );
+      ref.invalidate(applicationsListProvider);
+      navigator.pop();
       messenger.showSnackBar(
         SnackBar(
-          content: Text('Applied to ${job.title} at ${job.company} 🎉'),
+          content: Text('Applied to ${widget.job.title} 🎉'),
           backgroundColor: AppColors.success,
         ),
       );
     } catch (e) {
+      setState(() => _submitting = false);
       messenger.showSnackBar(
         const SnackBar(
           content: Text('Could not submit application. Please try again.'),
@@ -253,6 +358,134 @@ class _JobDetailBody extends ConsumerWidget {
         ),
       );
     }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final profile = ref.watch(profileProvider).value;
+    final bottom = MediaQuery.of(context).viewInsets.bottom;
+    return Padding(
+      padding: EdgeInsets.only(bottom: bottom),
+      child: Container(
+        decoration: const BoxDecoration(
+          color: AppColors.backgroundCard,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        padding: const EdgeInsets.all(AppDimensions.paddingL),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Center(
+              child: Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: AppColors.border,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Apply to ${widget.job.title}',
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w800,
+                color: AppColors.textPrimary,
+              ),
+            ),
+            Text(
+              '${widget.job.company} · applying as ${profile?.fullName ?? 'you'}',
+              style: const TextStyle(fontSize: 13, color: AppColors.textMuted),
+            ),
+            const SizedBox(height: 18),
+            const Text(
+              'Your CV *',
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w700,
+                color: AppColors.textSecondary,
+              ),
+            ),
+            const SizedBox(height: 8),
+            GestureDetector(
+              onTap: _pickCv,
+              child: Container(
+                padding: const EdgeInsets.all(AppDimensions.paddingM),
+                decoration: BoxDecoration(
+                  color: AppColors.backgroundSurface,
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusM),
+                  border: Border.all(
+                    color: _cvBytes == null
+                        ? AppColors.border
+                        : AppColors.success.withValues(alpha: 0.5),
+                    width: 1.4,
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      _cvBytes == null
+                          ? Icons.upload_file_outlined
+                          : Icons.description,
+                      color: _cvBytes == null
+                          ? AppColors.primary
+                          : AppColors.success,
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        _cvName ?? 'Upload PDF or Word document',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: _cvBytes == null
+                              ? AppColors.textMuted
+                              : AppColors.textPrimary,
+                        ),
+                      ),
+                    ),
+                    if (_cvBytes != null)
+                      const Icon(Icons.check_circle,
+                          color: AppColors.success, size: 20),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              'Cover note (optional)',
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w700,
+                color: AppColors.textSecondary,
+              ),
+            ),
+            const SizedBox(height: 8),
+            TextField(
+              controller: _note,
+              maxLines: 4,
+              minLines: 3,
+              style: const TextStyle(color: AppColors.textPrimary),
+              decoration: const InputDecoration(
+                hintText: 'Add a short note to the hiring manager...',
+              ),
+            ),
+            const SizedBox(height: 18),
+            GradientButton(
+              label: 'Submit application',
+              icon: Icons.send_rounded,
+              isLoading: _submitting,
+              onTap: _submit,
+            ),
+            const SizedBox(height: 8),
+          ],
+        ),
+      ),
+    );
   }
 }
 

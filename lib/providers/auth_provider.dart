@@ -1,3 +1,4 @@
+import 'dart:typed_data';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../data/models/profile_model.dart';
@@ -59,6 +60,20 @@ class ProfileNotifier extends StateNotifier<AsyncValue<ProfileModel?>> {
       appLogger.e('Update profile error: $e');
       state = AsyncValue.error(e, st);
     }
+  }
+
+  /// Uploads a new profile picture and persists its URL on the profile.
+  Future<void> uploadAvatar(Uint8List bytes, {String extension = 'jpg'}) async {
+    if (_userId == null) return;
+    final url = await _authService.uploadAvatar(
+      _userId,
+      bytes,
+      extension: extension,
+    );
+    final updated = await _authService.updateProfile(_userId, {
+      'avatar_url': url,
+    });
+    state = AsyncValue.data(updated);
   }
 }
 

@@ -8,12 +8,16 @@ import '../../../data/models/career_path_model.dart';
 class CareerPathCard extends StatelessWidget {
   final CareerPathModel careerPath;
   final VoidCallback onTap;
+  final VoidCallback? onLongPress;
+  final VoidCallback? onDelete;
   final int index;
 
   const CareerPathCard({
     super.key,
     required this.careerPath,
     required this.onTap,
+    this.onLongPress,
+    this.onDelete,
     this.index = 0,
   });
 
@@ -32,6 +36,7 @@ class CareerPathCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
           onTap: onTap,
+          onLongPress: onLongPress,
           child: Container(
             decoration: BoxDecoration(
               gradient: const LinearGradient(
@@ -86,6 +91,27 @@ class CareerPathCard extends StatelessWidget {
                           ),
                         ),
                       ),
+                      if (onDelete != null) ...[
+                        const SizedBox(width: 4),
+                        GestureDetector(
+                          onTap: onDelete,
+                          behavior: HitTestBehavior.opaque,
+                          child: Container(
+                            width: 32,
+                            height: 32,
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              color: AppColors.error.withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: const Icon(
+                              Icons.delete_outline,
+                              size: 18,
+                              color: AppColors.error,
+                            ),
+                          ),
+                        ),
+                      ],
                     ],
                   ),
                   const SizedBox(height: 6),

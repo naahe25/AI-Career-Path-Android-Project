@@ -85,58 +85,154 @@ class AiService {
 
   List<GeneratedPath> _fallbackCareerPaths(ProfileModel profile) {
     final targetField = (profile.desiredField ?? '').trim();
-    final baseTitle = targetField.isNotEmpty
-        ? targetField
-        : 'Software Engineering';
+    final field = targetField.isNotEmpty ? targetField : 'Software Engineering';
+    // A short, stable suffix so the two generated paths never collide by title
+    // (the dashboard prevents adding the same titled path twice).
+    final stamp = DateTime.now().millisecondsSinceEpoch.remainder(100000);
+
+    Map<String, dynamic> resource(String title, String url, String type) =>
+        {'title': title, 'url': url, 'type': type};
 
     return [
       GeneratedPath(
-        title: '$baseTitle - Career Path (Starter)',
+        title: '$field — Foundations to First Role',
         description:
-            'Demo fallback path generated locally because the AI service is unavailable.',
-        targetRole: 'Professional',
-        estimatedDurationMonths: 12,
+            'A beginner-friendly roadmap that takes you from fundamentals to a '
+            'portfolio strong enough to land your first $field role.',
+        targetRole: '$field Associate',
+        estimatedDurationMonths: 9,
         difficultyLevel: 'beginner',
         milestones: [
           {
-            'title': 'Foundations',
-            'description': 'Core concepts & fundamentals',
-            'completed': false,
+            'title': 'Master the Fundamentals',
+            'description':
+                'Build a rock-solid base in the core concepts of $field. Take '
+                'structured notes and complete every exercise.',
+            'estimated_weeks': 5,
+            'skills_gained': ['Core concepts', 'Problem solving', 'Tooling'],
+            'resources': [
+              resource('freeCodeCamp', 'https://www.freecodecamp.org', 'course'),
+              resource('Khan Academy', 'https://www.khanacademy.org', 'course'),
+            ],
           },
           {
-            'title': 'Projects',
-            'description': 'Build 2-3 portfolio projects',
-            'completed': false,
+            'title': 'Build Your First Project',
+            'description':
+                'Apply what you learned by shipping a small but complete '
+                'project end-to-end. Put it on GitHub with a clear README.',
+            'estimated_weeks': 4,
+            'skills_gained': ['Project setup', 'Version control', 'Debugging'],
+            'resources': [
+              resource('GitHub Get Started', 'https://docs.github.com/get-started', 'documentation'),
+              resource('The Odin Project', 'https://www.theodinproject.com', 'project'),
+            ],
           },
           {
-            'title': 'Interview Prep',
-            'description': 'Practice behavioral + technical rounds',
-            'completed': false,
+            'title': 'Go Deeper on One Specialty',
+            'description':
+                'Pick the part of $field you enjoy most and study it deeply. '
+                'Rebuild a real-world feature from scratch.',
+            'estimated_weeks': 5,
+            'skills_gained': ['Specialization', 'Best practices', 'Testing'],
+            'resources': [
+              resource('MDN Web Docs', 'https://developer.mozilla.org', 'documentation'),
+              resource('Coursera', 'https://www.coursera.org', 'course'),
+            ],
+          },
+          {
+            'title': 'Build a Portfolio',
+            'description':
+                'Polish 3 projects that show range. Write a short case study '
+                'for each explaining the problem, approach, and result.',
+            'estimated_weeks': 4,
+            'skills_gained': ['Portfolio', 'Technical writing', 'UX polish'],
+            'resources': [
+              resource('GitHub Pages', 'https://pages.github.com', 'documentation'),
+              resource('Portfolio examples', 'https://github.com', 'project'),
+            ],
+          },
+          {
+            'title': 'Interview Preparation',
+            'description':
+                'Practice common questions, refine your resume, and run mock '
+                'interviews until you feel calm and confident.',
+            'estimated_weeks': 4,
+            'skills_gained': ['Interviewing', 'Resume', 'Communication'],
+            'resources': [
+              resource('LeetCode', 'https://leetcode.com', 'project'),
+              resource('Tech Interview Handbook', 'https://www.techinterviewhandbook.org', 'documentation'),
+            ],
           },
         ],
       ),
       GeneratedPath(
-        title: '$baseTitle - Career Path (Intermediate)',
+        title: '$field — Job-Ready to Senior (#$stamp)',
         description:
-            'A second demo fallback option to keep the app fully usable without backend.',
-        targetRole: 'Senior',
-        estimatedDurationMonths: 18,
+            'An intermediate track for people already familiar with the basics '
+            'who want to reach a senior $field level with real impact.',
+        targetRole: 'Senior $field Specialist',
+        estimatedDurationMonths: 14,
         difficultyLevel: 'intermediate',
         milestones: [
           {
-            'title': 'Specialization',
-            'description': 'Pick one specialization track',
-            'completed': false,
+            'title': 'Deepen Core Expertise',
+            'description':
+                'Close knowledge gaps and learn the advanced patterns that '
+                'separate juniors from seniors in $field.',
+            'estimated_weeks': 6,
+            'skills_gained': ['Advanced patterns', 'Architecture', 'Performance'],
+            'resources': [
+              resource('Frontend Masters', 'https://frontendmasters.com', 'course'),
+              resource('Official docs', 'https://devdocs.io', 'documentation'),
+            ],
           },
           {
-            'title': 'Advanced Projects',
-            'description': 'Ship one production-like project',
-            'completed': false,
+            'title': 'Ship a Production-Grade Project',
+            'description':
+                'Build something real users could use: auth, a database, tests '
+                'and a deployment pipeline. Treat it like a real product.',
+            'estimated_weeks': 8,
+            'skills_gained': ['System design', 'CI/CD', 'Testing'],
+            'resources': [
+              resource('Supabase Docs', 'https://supabase.com/docs', 'documentation'),
+              resource('Deploy with Vercel', 'https://vercel.com/docs', 'documentation'),
+            ],
           },
           {
-            'title': 'Leadership & Impact',
-            'description': 'Show impact, metrics, and collaboration',
-            'completed': false,
+            'title': 'Contribute to Open Source',
+            'description':
+                'Make meaningful contributions to a real project. Learn to read '
+                'large codebases and collaborate through pull requests.',
+            'estimated_weeks': 6,
+            'skills_gained': ['Collaboration', 'Code review', 'Git workflow'],
+            'resources': [
+              resource('Good First Issues', 'https://goodfirstissue.dev', 'project'),
+              resource('First Contributions', 'https://github.com/firstcontributions/first-contributions', 'project'),
+            ],
+          },
+          {
+            'title': 'Develop Leadership & Impact',
+            'description':
+                'Mentor others, lead a small feature end-to-end, and learn to '
+                'communicate trade-offs and measure impact with metrics.',
+            'estimated_weeks': 6,
+            'skills_gained': ['Mentorship', 'Communication', 'Ownership'],
+            'resources': [
+              resource('The Manager\'s Path', 'https://www.oreilly.com', 'book'),
+              resource('Staff Engineer', 'https://staffeng.com', 'documentation'),
+            ],
+          },
+          {
+            'title': 'Land a Senior Role',
+            'description':
+                'Target senior-level interviews. Prepare system-design stories '
+                'and quantify your achievements on your resume and profile.',
+            'estimated_weeks': 6,
+            'skills_gained': ['System design', 'Negotiation', 'Personal brand'],
+            'resources': [
+              resource('System Design Primer', 'https://github.com/donnemartin/system-design-primer', 'documentation'),
+              resource('LinkedIn Optimization', 'https://www.linkedin.com', 'article'),
+            ],
           },
         ],
       ),

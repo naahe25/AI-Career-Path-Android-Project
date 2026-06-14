@@ -42,6 +42,23 @@ class CareerPathsNotifier
     state = AsyncValue.data([path, ...current]);
   }
 
+  /// Removes a path so the user can later re-add it (paths are de-duplicated by
+  /// title in the dashboard). Optimistically drops it, reverting on failure.
+  Future<void> removeCareerPath(String pathId) async {
+    final current = state.value ?? [];
+    final previous = current;
+    state = AsyncValue.data(
+      current.where((p) => p.id != pathId).toList(),
+    );
+    try {
+      await _careerService.deleteCareerPath(pathId);
+    } catch (e) {
+      appLogger.e('Remove career path error: $e');
+      state = AsyncValue.data(previous);
+      rethrow;
+    }
+  }
+
   Future<void> toggleMilestone(
     String pathId,
     String milestoneId,

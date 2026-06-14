@@ -16,8 +16,10 @@ import 'presentation/screens/skills/skills_screen.dart';
 import 'presentation/screens/settings/settings_screen.dart';
 import 'presentation/screens/jobs/jobs_screen.dart';
 import 'presentation/screens/jobs/job_detail_screen.dart';
+import 'presentation/screens/jobs/job_applicants_screen.dart';
 import 'presentation/screens/jobs/saved_jobs_screen.dart';
 import 'presentation/screens/jobs/post_job_screen.dart';
+import 'presentation/screens/profile/edit_profile_screen.dart';
 import 'presentation/screens/feed/feed_screen.dart';
 import 'presentation/screens/network/network_screen.dart';
 import 'presentation/widgets/common/main_shell.dart';
@@ -130,6 +132,17 @@ final routerProvider = Provider<GoRouter>((ref) {
         parentNavigatorKey: _rootKey,
         builder: (context, state) =>
             JobDetailScreen(jobId: state.pathParameters['id']!),
+      ),
+      GoRoute(
+        path: '/job/:id/applicants',
+        parentNavigatorKey: _rootKey,
+        builder: (context, state) =>
+            JobApplicantsScreen(jobId: state.pathParameters['id']!),
+      ),
+      GoRoute(
+        path: '/edit-profile',
+        parentNavigatorKey: _rootKey,
+        builder: (context, state) => const EditProfileScreen(),
       ),
       GoRoute(
         path: '/saved-jobs',

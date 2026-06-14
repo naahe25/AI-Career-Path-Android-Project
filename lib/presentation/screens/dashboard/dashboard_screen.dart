@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_dimensions.dart';
+import '../../../data/models/career_path_model.dart';
 import '../../../data/services/ai_service.dart';
 import '../../../providers/auth_provider.dart';
 import '../../../providers/career_provider.dart';
@@ -44,6 +45,49 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
       }
     } finally {
       if (mounted) setState(() => _isGenerating = false);
+    }
+  }
+
+  Future<void> _confirmRemovePath(CareerPathModel path) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppColors.backgroundCard,
+        title: const Text('Remove path?'),
+        content: Text(
+          'Remove "${path.title}" from your career paths? '
+          'You can generate and add it again later.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Remove',
+                style: TextStyle(color: AppColors.error)),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+    final messenger = ScaffoldMessenger.of(context);
+    try {
+      await ref.read(careerPathsProvider.notifier).removeCareerPath(path.id);
+      messenger.showSnackBar(
+        const SnackBar(
+          content: Text('Path removed.'),
+          backgroundColor: AppColors.info,
+        ),
+      );
+    } catch (_) {
+      messenger.showSnackBar(
+        const SnackBar(
+          content: Text('Could not remove the path. Please try again.'),
+          backgroundColor: AppColors.error,
+        ),
+      );
     }
   }
 
@@ -235,6 +279,14 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                             color: AppColors.textPrimary,
                           ),
                         ).animate(delay: 200.ms).fadeIn(),
+                        const SizedBox(height: 2),
+                        const Text(
+                          'Tap a path to open it · tap the 🗑 icon to remove it.',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: AppColors.textMuted,
+                          ),
+                        ).animate(delay: 220.ms).fadeIn(),
                         const SizedBox(height: 14),
                       ],
                     ),
@@ -273,6 +325,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                               onTap: () {
                                 context.push('/career-path/${path.id}');
                               },
+                              onLongPress: () => _confirmRemovePath(path),
+                              onDelete: () => _confirmRemovePath(path),
                             ),
                           );
                         }, childCount: paths.length),

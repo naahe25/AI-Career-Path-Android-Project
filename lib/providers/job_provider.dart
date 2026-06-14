@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../data/models/job_model.dart';
+import '../data/models/profile_model.dart';
 import '../data/services/job_service.dart';
 import 'auth_provider.dart';
 
@@ -127,9 +128,22 @@ class AppliedJobsNotifier extends StateNotifier<Set<String>> {
 
   bool hasApplied(String jobId) => state.contains(jobId);
 
-  Future<void> apply(String jobId, {String? coverNote}) async {
+  Future<void> apply(
+    String jobId, {
+    String? coverNote,
+    required String cvUrl,
+    required String cvName,
+    ProfileModel? applicant,
+  }) async {
     if (_userId == null) return;
-    await _service.applyToJob(_userId, jobId, coverNote: coverNote);
+    await _service.applyToJob(
+      _userId,
+      jobId,
+      coverNote: coverNote,
+      cvUrl: cvUrl,
+      cvName: cvName,
+      applicant: applicant,
+    );
     state = {...state, jobId};
   }
 }
@@ -148,4 +162,20 @@ final applicationsListProvider =
   if (user == null) return [];
   final service = ref.watch(jobServiceProvider);
   return service.getApplications(user.id);
+});
+
+/// Hiring listings posted by the current user (for the profile screen).
+final myPostedJobsProvider =
+    FutureProvider.autoDispose<List<JobModel>>((ref) async {
+  final user = ref.watch(currentUserProvider);
+  if (user == null) return [];
+  final service = ref.watch(jobServiceProvider);
+  return service.getJobsPostedBy(user.id);
+});
+
+/// Everyone who applied to a given job (visible only to that job's poster).
+final jobApplicantsProvider = FutureProvider.family
+    .autoDispose<List<JobApplicationModel>, String>((ref, jobId) async {
+  final service = ref.watch(jobServiceProvider);
+  return service.getApplicantsForJob(jobId);
 });

@@ -1,4 +1,8 @@
+import 'dart:typed_data';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:uuid/uuid.dart';
 import '../models/job_model.dart';
+import '../models/profile_model.dart';
 import '../../core/exceptions/app_exceptions.dart';
 import '../../core/utils/logger.dart';
 import 'supabase_service.dart';
@@ -90,6 +94,41 @@ class JobService {
     }
   }
 
+  /// Hiring listings posted by [userId] (for the profile "My job posts" view).
+  Future<List<JobModel>> getJobsPostedBy(String userId) async {
+    try {
+      final data = await _client
+          .from('jobs')
+          .select()
+          .eq('posted_by', userId)
+          .order('posted_at', ascending: false);
+      return (data as List).map((x) => JobModel.fromJson(x)).toList();
+    } catch (e) {
+      appLogger.e('Get posted jobs error: $e');
+      throw ServerException(
+          message: 'Failed to load your job posts', originalException: e);
+    }
+  }
+
+  /// Everyone who applied to [jobId]. RLS only returns rows when the current
+  /// user is the job's poster.
+  Future<List<JobApplicationModel>> getApplicantsForJob(String jobId) async {
+    try {
+      final data = await _client
+          .from('job_applications')
+          .select()
+          .eq('job_id', jobId)
+          .order('applied_at', ascending: false);
+      return (data as List)
+          .map((x) => JobApplicationModel.fromJson(x))
+          .toList();
+    } catch (e) {
+      appLogger.e('Get applicants error: $e');
+      throw ServerException(
+          message: 'Failed to load applicants', originalException: e);
+    }
+  }
+
   // --- Saved jobs ---------------------------------------------------------
   Future<Set<String>> getSavedJobIds(String userId) async {
     try {
@@ -169,13 +208,66 @@ class JobService {
     }
   }
 
-  Future<void> applyToJob(String userId, String jobId, {String? coverNote}) async {
+  /// Uploads an applicant's CV (PDF/Word) to the public `cvs` bucket and
+  /// returns its public URL.
+  Future<String> uploadCv(
+    String userId,
+    Uint8List bytes,
+    String fileName, {
+    String extension = 'pdf',
+  }) async {
+    try {
+      final ext = extension.toLowerCase();
+      final path = '$userId/${const Uuid().v4()}.$ext';
+      await _client.storage.from('cvs').uploadBinary(
+            path,
+            bytes,
+            fileOptions: FileOptions(
+              contentType: _cvContentType(ext),
+              upsert: true,
+            ),
+          );
+      return _client.storage.from('cvs').getPublicUrl(path);
+    } catch (e) {
+      appLogger.e('Upload CV error: $e');
+      throw ServerException(
+          message: 'Failed to upload CV', originalException: e);
+    }
+  }
+
+  String _cvContentType(String ext) {
+    switch (ext) {
+      case 'pdf':
+        return 'application/pdf';
+      case 'doc':
+        return 'application/msword';
+      case 'docx':
+        return 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+      default:
+        return 'application/octet-stream';
+    }
+  }
+
+  Future<void> applyToJob(
+    String userId,
+    String jobId, {
+    String? coverNote,
+    required String cvUrl,
+    required String cvName,
+    ProfileModel? applicant,
+  }) async {
     try {
       await _client.from('job_applications').upsert({
         'user_id': userId,
         'job_id': jobId,
         'status': 'applied',
         'cover_note': coverNote,
+        'cv_url': cvUrl,
+        'cv_name': cvName,
+        'applicant_name': applicant?.fullName,
+        'applicant_avatar_url': applicant?.avatarUrl,
+        'applicant_headline':
+            applicant?.currentRole ?? applicant?.desiredField,
         'applied_at': DateTime.now().toIso8601String(),
       }, onConflict: 'user_id,job_id');
     } catch (e) {

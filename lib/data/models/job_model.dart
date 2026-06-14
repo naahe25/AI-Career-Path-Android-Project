@@ -118,6 +118,11 @@ class JobApplicationModel {
   final String jobId;
   final String status;
   final String? coverNote;
+  final String? cvUrl;
+  final String? cvName;
+  final String? applicantName;
+  final String? applicantAvatarUrl;
+  final String? applicantHeadline;
   final DateTime appliedAt;
   final JobModel? job;
 
@@ -127,6 +132,11 @@ class JobApplicationModel {
     required this.jobId,
     this.status = 'applied',
     this.coverNote,
+    this.cvUrl,
+    this.cvName,
+    this.applicantName,
+    this.applicantAvatarUrl,
+    this.applicantHeadline,
     required this.appliedAt,
     this.job,
   });
@@ -138,6 +148,11 @@ class JobApplicationModel {
       jobId: json['job_id'] as String,
       status: json['status'] as String? ?? 'applied',
       coverNote: json['cover_note'] as String?,
+      cvUrl: json['cv_url'] as String?,
+      cvName: json['cv_name'] as String?,
+      applicantName: json['applicant_name'] as String?,
+      applicantAvatarUrl: json['applicant_avatar_url'] as String?,
+      applicantHeadline: json['applicant_headline'] as String?,
       appliedAt: DateTime.parse(json['applied_at'] as String),
       job: json['jobs'] != null
           ? JobModel.fromJson(json['jobs'] as Map<String, dynamic>)
