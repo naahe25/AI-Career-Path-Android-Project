@@ -6,6 +6,10 @@
 
 AI Career Path is a comprehensive cross-platform mobile application designed to provide personalized career guidance and development pathways using artificial intelligence. This project combines native development capabilities with modern mobile frameworks to deliver intelligent career recommendations and progress tracking.
 
+## Screenshots
+
+
+
 ## ✨ Key Features
 
 - **AI-Powered Career Recommendations**: Intelligent algorithms that analyze skills and preferences to suggest suitable career paths
